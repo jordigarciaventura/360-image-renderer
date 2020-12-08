@@ -8,6 +8,12 @@ Tested versions:
 - Blender 2.83
 
 ## INSTALLATION
+In GitHub:
 
+1. Download the add-on as ZIP.
 
-## PREVIEW
+In Blender:
+
+2. Go to `Edit > Preferences > Add-ons > Install...`
+3. Select the ZIP.
+4. Enable the add-on.
