@@ -123,6 +123,9 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_x_angle(self, value):
 
+        left_steps = self.get("left_steps", 0)
+        right_steps = self.get("right_steps", 0)
+
         # Change angle
         self["x_angle"] = value
 
@@ -133,22 +136,22 @@ class MyProperties(bpy.types.PropertyGroup):
             self["x_steps_max"] -= 1
 
         # Change right/left steps
-        x_steps_total = self["right_steps"] + self["left_steps"]
+        x_steps_total = right_steps + left_steps
 
         if x_steps_total > self["x_steps_max"]:
 
             # Distribute the max steps proportionally (losing the decimals == 1 unit)
             factor = self["x_steps_max"] / x_steps_total
 
-            left_steps_new = int(self["left_steps"] * factor)
-            right_steps_new = int(self["right_steps"] * factor)
+            left_steps_new = int(left_steps * factor)
+            right_steps_new = int(right_steps * factor)
 
             # Distribute the unit
             x_steps_total = left_steps_new + right_steps_new
 
             if x_steps_total < self["x_steps_max"]:
 
-                if self["right_steps"] >= self["left_steps"]:
+                if right_steps >= left_steps:
                     right_steps_new += 1
                 else:
                     left_steps_new += 1
@@ -161,7 +164,8 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_right_steps(self, value):
 
-        x_steps_max = self.get("x_steps_max", 259)
+        left_steps = self.get("left_steps", 0)
+        x_steps_max = self.get("x_steps_max", 359)
 
         # Clamp value to max steps
         value = max(0, min(value, x_steps_max))
@@ -170,16 +174,15 @@ class MyProperties(bpy.types.PropertyGroup):
         self["right_steps"] = value
 
         # Clamp left steps with the rest
-        self["left_steps"] = max(
-            0, min(self["left_steps"], x_steps_max - self["right_steps"])
-        )
+        self["left_steps"] = max(0, min(left_steps, x_steps_max - self["right_steps"]))
 
     def get_left_steps(self):
         return self.get("left_steps", 0)
 
     def set_left_steps(self, value):
 
-        x_steps_max = self.get("x_steps_max", 259)
+        right_steps = self.get("right_steps", 0)
+        x_steps_max = self.get("x_steps_max", 359)
 
         # Clamp value to max steps
         value = max(0, min(value, x_steps_max))
@@ -188,9 +191,7 @@ class MyProperties(bpy.types.PropertyGroup):
         self["left_steps"] = value
 
         # Clamp right steps with the rest
-        self["right_steps"] = max(
-            0, min(self["right_steps"], x_steps_max - self["left_steps"])
-        )
+        self["right_steps"] = max(0, min(right_steps, x_steps_max - self["left_steps"]))
 
     # Vertical Axis
 
@@ -216,6 +217,10 @@ class MyProperties(bpy.types.PropertyGroup):
         return self.get("y_angle", radians(1))
 
     def set_y_angle(self, value):
+
+        up_steps = self.get("up_steps", 0)
+        down_steps = self.get("down_steps", 0)
+
         # Change angle
         self["y_angle"] = value
 
@@ -226,22 +231,22 @@ class MyProperties(bpy.types.PropertyGroup):
             self["y_steps_max"] -= 1
 
         # Change up/down steps
-        y_steps_total = self["up_steps"] + self["down_steps"]
+        y_steps_total = up_steps + down_steps
 
         if y_steps_total > self["y_steps_max"]:
 
             # Distribute the max steps proportionally (losing the decimals == 1 unit)
             factor = self["y_steps_max"] / y_steps_total
 
-            down_steps_new = int(self["down_steps"] * factor)
-            up_steps_new = int(self["up_steps"] * factor)
+            down_steps_new = int(down_steps * factor)
+            up_steps_new = int(up_steps * factor)
 
             # Distribute the unit
             y_steps_total = down_steps_new + up_steps_new
 
             if y_steps_total < self["y_steps_max"]:
 
-                if self["up_steps"] >= self["down_steps"]:
+                if up_steps >= down_steps:
                     up_steps_new += 1
                 else:
                     down_steps_new += 1
@@ -254,7 +259,8 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_up_steps(self, value):
 
-        y_steps_max = self.get("y_steps_max", 259)
+        down_steps = self.get("down_steps", 0)
+        y_steps_max = self.get("y_steps_max", 359)
 
         # Clamp value to max steps
         value = max(0, min(value, y_steps_max))
@@ -263,16 +269,15 @@ class MyProperties(bpy.types.PropertyGroup):
         self["up_steps"] = value
 
         # Clamp down steps with the rest
-        self["down_steps"] = max(
-            0, min(self["down_steps"], y_steps_max - self["up_steps"])
-        )
+        self["down_steps"] = max(0, min(down_steps, y_steps_max - self["up_steps"]))
 
     def get_down_steps(self):
         return self.get("down_steps", 0)
 
     def set_down_steps(self, value):
 
-        y_steps_max = self.get("y_steps_max", 259)
+        up_steps = self.get("up_steps", 0)
+        y_steps_max = self.get("y_steps_max", 359)
 
         # Clamp value to max steps
         value = max(0, min(value, y_steps_max))
@@ -281,9 +286,7 @@ class MyProperties(bpy.types.PropertyGroup):
         self["down_steps"] = value
 
         # Clamp right steps with the rest
-        self["up_steps"] = max(
-            0, min(self["up_steps"], y_steps_max - self["down_steps"])
-        )
+        self["up_steps"] = max(0, min(up_steps, y_steps_max - self["down_steps"]))
 
     # Create keyframes
 
@@ -312,29 +315,32 @@ class MyProperties(bpy.types.PropertyGroup):
         x = 0
         y = 0
 
+        x_axis = self.get("x_axis", False)
+        y_axis = self.get("y_axis", False)
+
         # Set x and y
-        if self["x_axis"]:
-            if self["x_turnaround"]:
-                x = self["x_steps"]
+        if x_axis:
+            if self.get("x_turnaround", False):
+                x = self.get("x_steps", 360)
             else:
-                x = 1 + self["right_steps"] + self["left_steps"]
+                x = 1 + self.get("right_steps", 0) + self.get("left_steps", 0)
         else:
             x = 1
 
-        if self["y_axis"]:
-            if self["y_turnaround"]:
-                y = self["y_steps"]
+        if y_axis:
+            if self.get("y_turnaround", False):
+                y = self.get("y_steps", 360)
             else:
-                y = 1 + self["up_steps"] + self["down_steps"]
+                y = 1 + self.get("up_steps", 0) + self.get("down_steps", 0)
         else:
             y = 1
 
         # Calculate views count
-        if not (self["x_axis"]) and not (self["y_axis"]):
+        if not x_axis and not y_axis:
             return 1
-        elif self["x_axis"] and self["y_axis"]:
+        elif x_axis and y_axis:
             return x * y
-        elif self["x_axis"]:
+        elif x_axis:
             return x
         else:
             return y
