@@ -6,11 +6,12 @@ Blender add-on for render your models up to 360º as image sequence.
 Tested versions:
 - Blender 2.81
 - Blender 2.83
+- Blender 2.92
 
 ## INSTALLATION
 In GitHub:
 
-1. Download the add-on as ZIP.
+1. Download the add-on as ZIP
 
 In Blender:
 
