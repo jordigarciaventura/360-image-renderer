@@ -10,7 +10,7 @@ from math import (
 import re
 
 initial_rotation = None
-views = set()
+values = []
 
 # Rotate object
 def rotate_and_add_marker(
@@ -18,6 +18,7 @@ def rotate_and_add_marker(
 ):
 
     scene = bpy.context.scene
+    mytool = scene.my_tool
 
     # Get orient axis
     x_orient_axis = x_axis.replace("-", "")
@@ -30,17 +31,20 @@ def rotate_and_add_marker(
     for y in range(0, abs(y_steps) + 1):
         for x in range(0, abs(x_steps) + 1):
 
+            # Check to avoid repetitions
+            global values
+
             # Get x and y signed (ID)
             signed_x = -x if x_steps < 0 else x
             signed_y = -y if y_steps < 0 else y
 
-            # Check to avoid repetitions
-            if (signed_x, signed_y) in views:
+            if (signed_x, signed_y) in values:
                 continue
             else:
-                views.add((signed_x, signed_y))
+                values.append((signed_x, signed_y))
 
             # Calculate absolute angles
+
             x_angle_abs = radians(degrees(x_angle * x))
             y_angle_abs = radians(degrees(y_angle * y))
 
@@ -74,10 +78,18 @@ def rotate_and_add_marker(
                     if marker.frame == scene.frame_current:
                         scene.timeline_markers.remove(marker)
 
-                # Add marker namerule
+                x_value = str(signed_x)
+                y_value = str(signed_y)
+
+                if not mytool.x_turnaround and signed_x > 0:
+                    x_value = "+" + x_value
+
+                if not mytool.y_turnaround and signed_y > 0:
+                    y_value = "+" + y_value
+
                 marker_name = marker_namerule
-                marker_name = marker_name.replace("%V%", str(signed_y))
-                marker_name = marker_name.replace("%H%", str(signed_x))
+                marker_name = marker_name.replace("%H", x_value)
+                marker_name = marker_name.replace("%V", y_value)
 
                 scene.timeline_markers.new(marker_name, frame=scene.frame_current)
 
@@ -96,8 +108,8 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         scene = context.scene
         mytool = scene.my_tool
 
+        global obj
         global views
-        views.clear()
 
         # Check dependencies
 
@@ -120,13 +132,13 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
                 return {"FINISHED"}
 
             if mytool.x_axis:
-                if "%H%" not in name:
+                if "%H" not in name:
 
                     self.report({"ERROR"}, prop.marker_name_h_missing_error)
                     return {"FINISHED"}
 
             if mytool.y_axis:
-                if "%V%" not in name:
+                if "%V" not in name:
 
                     self.report({"ERROR"}, prop.marker_name_v_missing_error)
                     return {"FINISHED"}
@@ -137,6 +149,9 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         scene.frame_start = scene.frame_current
 
         # Rotate objects
+
+        global initialized
+        initialized = False
 
         global initial_rotation
         initial_rotation = obj.rotation_euler.copy()

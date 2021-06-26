@@ -35,8 +35,8 @@ marker_name_error = (
 not_in_view_layer_error = "The %s is not in the View Layer"
 no_selected_error = "No %s selected"
 project_not_saved_error = "The project is not saved"
-marker_name_h_missing_error = "Use %H% in Marker name or disable Horizontal Axis"
-marker_name_v_missing_error = "Use %V% in Marker name or disable Vertical Axis"
+marker_name_h_missing_error = "Use %H in Marker name or disable Horizontal Axis"
+marker_name_v_missing_error = "Use %V in Marker name or disable Vertical Axis"
 path_empty_error = "Select a path to save the frames"
 no_active_camera_error = "There is no active camera"
 markers_names_named_error = "Not all frames within the render range have a named marker"
@@ -123,9 +123,6 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_x_angle(self, value):
 
-        left_steps = self.get("left_steps", 0)
-        right_steps = self.get("right_steps", 0)
-
         # Change angle
         self["x_angle"] = value
 
@@ -136,22 +133,22 @@ class MyProperties(bpy.types.PropertyGroup):
             self["x_steps_max"] -= 1
 
         # Change right/left steps
-        x_steps_total = right_steps + left_steps
+        x_steps_total = self["right_steps"] + self["left_steps"]
 
         if x_steps_total > self["x_steps_max"]:
 
             # Distribute the max steps proportionally (losing the decimals == 1 unit)
             factor = self["x_steps_max"] / x_steps_total
 
-            left_steps_new = int(left_steps * factor)
-            right_steps_new = int(right_steps * factor)
+            left_steps_new = int(self["left_steps"] * factor)
+            right_steps_new = int(self["right_steps"] * factor)
 
             # Distribute the unit
             x_steps_total = left_steps_new + right_steps_new
 
             if x_steps_total < self["x_steps_max"]:
 
-                if right_steps >= left_steps:
+                if self["right_steps"] >= self["left_steps"]:
                     right_steps_new += 1
                 else:
                     left_steps_new += 1
@@ -164,8 +161,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_right_steps(self, value):
 
-        left_steps = self.get("left_steps", 0)
-        x_steps_max = self.get("x_steps_max", 359)
+        x_steps_max = self.get("x_steps_max", 259)
 
         # Clamp value to max steps
         value = max(0, min(value, x_steps_max))
@@ -174,15 +170,16 @@ class MyProperties(bpy.types.PropertyGroup):
         self["right_steps"] = value
 
         # Clamp left steps with the rest
-        self["left_steps"] = max(0, min(left_steps, x_steps_max - self["right_steps"]))
+        self["left_steps"] = max(
+            0, min(self["left_steps"], x_steps_max - self["right_steps"])
+        )
 
     def get_left_steps(self):
         return self.get("left_steps", 0)
 
     def set_left_steps(self, value):
 
-        right_steps = self.get("right_steps", 0)
-        x_steps_max = self.get("x_steps_max", 359)
+        x_steps_max = self.get("x_steps_max", 259)
 
         # Clamp value to max steps
         value = max(0, min(value, x_steps_max))
@@ -191,7 +188,9 @@ class MyProperties(bpy.types.PropertyGroup):
         self["left_steps"] = value
 
         # Clamp right steps with the rest
-        self["right_steps"] = max(0, min(right_steps, x_steps_max - self["left_steps"]))
+        self["right_steps"] = max(
+            0, min(self["right_steps"], x_steps_max - self["left_steps"])
+        )
 
     # Vertical Axis
 
@@ -217,10 +216,6 @@ class MyProperties(bpy.types.PropertyGroup):
         return self.get("y_angle", radians(1))
 
     def set_y_angle(self, value):
-
-        up_steps = self.get("up_steps", 0)
-        down_steps = self.get("down_steps", 0)
-
         # Change angle
         self["y_angle"] = value
 
@@ -231,22 +226,22 @@ class MyProperties(bpy.types.PropertyGroup):
             self["y_steps_max"] -= 1
 
         # Change up/down steps
-        y_steps_total = up_steps + down_steps
+        y_steps_total = self["up_steps"] + self["down_steps"]
 
         if y_steps_total > self["y_steps_max"]:
 
             # Distribute the max steps proportionally (losing the decimals == 1 unit)
             factor = self["y_steps_max"] / y_steps_total
 
-            down_steps_new = int(down_steps * factor)
-            up_steps_new = int(up_steps * factor)
+            down_steps_new = int(self["down_steps"] * factor)
+            up_steps_new = int(self["up_steps"] * factor)
 
             # Distribute the unit
             y_steps_total = down_steps_new + up_steps_new
 
             if y_steps_total < self["y_steps_max"]:
 
-                if up_steps >= down_steps:
+                if self["up_steps"] >= self["down_steps"]:
                     up_steps_new += 1
                 else:
                     down_steps_new += 1
@@ -259,8 +254,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
     def set_up_steps(self, value):
 
-        down_steps = self.get("down_steps", 0)
-        y_steps_max = self.get("y_steps_max", 359)
+        y_steps_max = self.get("y_steps_max", 259)
 
         # Clamp value to max steps
         value = max(0, min(value, y_steps_max))
@@ -269,15 +263,16 @@ class MyProperties(bpy.types.PropertyGroup):
         self["up_steps"] = value
 
         # Clamp down steps with the rest
-        self["down_steps"] = max(0, min(down_steps, y_steps_max - self["up_steps"]))
+        self["down_steps"] = max(
+            0, min(self["down_steps"], y_steps_max - self["up_steps"])
+        )
 
     def get_down_steps(self):
         return self.get("down_steps", 0)
 
     def set_down_steps(self, value):
 
-        up_steps = self.get("up_steps", 0)
-        y_steps_max = self.get("y_steps_max", 359)
+        y_steps_max = self.get("y_steps_max", 259)
 
         # Clamp value to max steps
         value = max(0, min(value, y_steps_max))
@@ -286,12 +281,14 @@ class MyProperties(bpy.types.PropertyGroup):
         self["down_steps"] = value
 
         # Clamp right steps with the rest
-        self["up_steps"] = max(0, min(up_steps, y_steps_max - self["down_steps"]))
+        self["up_steps"] = max(
+            0, min(self["up_steps"], y_steps_max - self["down_steps"])
+        )
 
     # Create keyframes
 
     def get_marker_name(self):
-        return self.get("marker_name", "V%V%H%H%")
+        return self.get("marker_name", "V%VH%H")
 
     def set_marker_name(self, value):
 
@@ -304,8 +301,8 @@ class MyProperties(bpy.types.PropertyGroup):
         else:
             marker_name = value
             marker_name_preview = value
-            marker_name_preview = marker_name_preview.replace("%V%", "1")
-            marker_name_preview = marker_name_preview.replace("%H%", "0")
+            marker_name_preview = marker_name_preview.replace("%V", "1")
+            marker_name_preview = marker_name_preview.replace("%H", "0")
 
     def get_marker_name_preview(self):
         return self.get("marker_name_preview", "V1H0")
@@ -315,32 +312,29 @@ class MyProperties(bpy.types.PropertyGroup):
         x = 0
         y = 0
 
-        x_axis = self.get("x_axis", False)
-        y_axis = self.get("y_axis", False)
-
         # Set x and y
-        if x_axis:
-            if self.get("x_turnaround", False):
-                x = self.get("x_steps", 360)
+        if self["x_axis"]:
+            if self["x_turnaround"]:
+                x = self["x_steps"]
             else:
-                x = 1 + self.get("right_steps", 0) + self.get("left_steps", 0)
+                x = 1 + self["right_steps"] + self["left_steps"]
         else:
             x = 1
 
-        if y_axis:
-            if self.get("y_turnaround", False):
-                y = self.get("y_steps", 360)
+        if self["y_axis"]:
+            if self["y_turnaround"]:
+                y = self["y_steps"]
             else:
-                y = 1 + self.get("up_steps", 0) + self.get("down_steps", 0)
+                y = 1 + self["up_steps"] + self["down_steps"]
         else:
             y = 1
 
         # Calculate views count
-        if not x_axis and not y_axis:
+        if not (self["x_axis"]) and not (self["y_axis"]):
             return 1
-        elif x_axis and y_axis:
+        elif self["x_axis"] and self["y_axis"]:
             return x * y
-        elif x_axis:
+        elif self["x_axis"]:
             return x
         else:
             return y
@@ -560,7 +554,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
     marker_name: StringProperty(
         name="",
-        description="Markers name (use %H% and %V% for horizontal and vertical values)",
+        description="Markers name (use %H and %V for horizontal and vertical values)",
         default="No marker name",
         maxlen=1024,
         subtype="FILE_NAME",
