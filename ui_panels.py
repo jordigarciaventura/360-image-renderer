@@ -36,8 +36,6 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel, RADIALRENDERER_panel):
 class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
     bl_label = "Align"
     bl_idname = "RADIALRENDERER_PT_align"
-    bl_parent_id = "RADIALRENDERER_PT_setup"
-    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
 
@@ -45,53 +43,33 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        # Object
-
-        row = layout.split(factor=0.4, align=True)
-        row.alignment = "RIGHT"
-        row.label(text="Object", icon_value=prop.icons["object"].icon_id)
-
-        row.prop(mytool, "obj", icon_value=prop.icons["none"].icon_id)
-
-        # Controller --> Object
-
-        layout.separator(factor=1)
-
-        box = layout.box()
-
-        if mytool.controller is None or mytool.obj is None:
-            box.enabled = False
-        else:
-            box.enabled = True
-
-        row = box.row(align=True)
-        row.alignment = "CENTER"
-
-        row.label(text="Controller")
-
-        if mytool.controller_to_obj:
-            row.prop(
-                mytool,
-                "controller_to_obj",
-                text="",
-                icon_value=prop.icons["right"].icon_id,
-            )
-        else:
-            row.prop(
-                mytool,
-                "controller_to_obj",
-                text="",
-                icon_value=prop.icons["left"].icon_id,
-            )
-
-        row.label(text="    Object")
-
-        # Location/Rotation
-
-        row = box.row(align=True)
-
-        row.operator("radialrenderer.align_location", text="Location")
-        row.operator("radialrenderer.align_rotation", text="Rotation")
+        col = layout.column()
+        
+        # From <> To
+        
+        box = col.box()
+        grid = box.grid_flow(columns=3, align=True)
+        
+        grid.label(text="From")
+        grid.prop(mytool, "from_obj", icon_value=prop.icons["none"].icon_id)
+        
+        grid.separator()
+        row = grid.row()
+        row.operator(
+          "radialrenderer.swap_align",
+          text="Swap",
+          icon='ARROW_LEFTRIGHT'
+        )
+        
+        grid.label(text="To")
+        grid.prop(mytool, "to_obj", icon_value=prop.icons["none"].icon_id)
+        
+        # Location and Rotation
+        
+        col.separator(factor=1)
+        col.operator("radialrenderer.align_location", text="Align Location")
+        col.separator(factor=1)
+        col.operator("radialrenderer.align_rotation", text="Align Rotation")
 
 
 class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel):

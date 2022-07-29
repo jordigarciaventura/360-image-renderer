@@ -374,6 +374,21 @@ class MyProperties(bpy.types.PropertyGroup):
         default=True,
     )
 
+    # Align
+    from_obj: PointerProperty(
+        type=bpy.types.Object,
+        name="",
+        description="Object to align from",
+        poll=is_in_view_layer,
+    )
+    
+    to_obj: PointerProperty(
+        type=bpy.types.Object,
+        name="",
+        description="Object to align to",
+        poll=is_in_view_layer,
+    )
+
     # Keyframe Assistant
 
     # X Turnaround

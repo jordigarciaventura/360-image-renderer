@@ -20,20 +20,17 @@ class RADIALRENDERER_OT_align_rotation(bpy.types.Operator):
 
         # Check dependencies
 
-        if not prop.is_in_view_layer(self, mytool.controller):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "Controller")
+        if not prop.is_in_view_layer(self, mytool.from_obj):
+            self.report({"ERROR"}, prop.not_in_view_layer_error % "From")
             return {"FINISHED"}
 
-        if not prop.is_in_view_layer(self, mytool.obj):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "Object")
+        if not prop.is_in_view_layer(self, mytool.to_obj):
+            self.report({"ERROR"}, prop.not_in_view_layer_error % "To")
             return {"FINISHED"}
 
         # Align rotation
 
-        if mytool.controller_to_obj:
-            align_rotation(mytool.controller, mytool.obj)
-        else:
-            align_rotation(mytool.obj, mytool.controller)
+        align_rotation(mytool.from_obj, mytool.to_obj)
 
         return {"FINISHED"}
 
