@@ -1,6 +1,6 @@
 import bpy
 
-from . import properties as prop
+import properties as prop
 
 
 class RADIALRENDERER_panel:
@@ -290,14 +290,17 @@ class RADIALRENDERER_PT_render(bpy.types.Panel, RADIALRENDERER_panel):
         )
 
 
-# ----------------------------------------------------------------------------------------------------------
-#    Registration
-# ----------------------------------------------------------------------------------------------------------
-
-
 classes = (
     RADIALRENDERER_PT_setup,
     RADIALRENDERER_PT_align,
     RADIALRENDERER_PT_keyframe_assistant,
     RADIALRENDERER_PT_render,
 )
+
+def register():
+  for cls in classes:
+    bpy.utils.register_class(cls)
+
+def unregister():
+  for cls in classes:
+    bpy.utils.unregister_class(cls)

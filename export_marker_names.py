@@ -1,7 +1,7 @@
 import bpy
 import os
 
-from . import properties as prop
+import properties as prop
 
 
 def export_marker_names(self, context, path):
@@ -98,3 +98,11 @@ class RADIALRENDERER_OT_export(bpy.types.Operator):
 
 
 classes = (RADIALRENDERER_OT_export,)
+
+def register():
+  for cls in classes:
+    bpy.utils.register_class(cls)
+
+def unregister():
+  for cls in classes:
+    bpy.utils.unregister_class(cls)

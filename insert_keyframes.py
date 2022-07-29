@@ -1,6 +1,6 @@
 import bpy
 
-from . import properties as prop
+import properties as prop
 
 from math import (
     radians,
@@ -367,3 +367,11 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
 
 
 classes = (RADIALRENDERER_OT_insert_keyframes,)
+
+def register():
+  for cls in classes:
+    bpy.utils.register_class(cls)
+
+def unregister():
+  for cls in classes:
+    bpy.utils.unregister_class(cls)

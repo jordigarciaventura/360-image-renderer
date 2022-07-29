@@ -1,6 +1,6 @@
 import bpy
 
-from . import properties as prop
+import properties as prop
 
 
 def align_location(obj_from, obj_to):
@@ -39,3 +39,11 @@ class RADIALRENDERER_OT_align_location(bpy.types.Operator):
 
 
 classes = (RADIALRENDERER_OT_align_location,)
+
+def register():
+  for cls in classes:
+    bpy.utils.register_class(cls)
+
+def unregister():
+  for cls in classes:
+    bpy.utils.unregister_class(cls)
