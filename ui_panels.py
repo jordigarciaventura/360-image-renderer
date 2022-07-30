@@ -19,18 +19,27 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel, RADIALRENDERER_panel):
         scene = context.scene
         mytool = scene.my_tool
 
-        # Add controller
+        col = layout.column()
 
-        row = layout.row()
-        row.operator("radialrenderer.create_preset", text="Add controller")
+        # Add camera controller
+
+        col.operator("radialrenderer.add_camera_controller", text="Add camera controller")
+
+        col.separator()
 
         # Controller
 
-        row = layout.split(factor=0.4, align=True)
-        row.alignment = "RIGHT"
+        box = col.box()
 
-        row.label(text="Controller", icon_value=prop.icons["controller"].icon_id)
-        row.prop(mytool, "controller", icon_value=prop.icons["none"].icon_id)
+        split = box.split(align=True, factor=0.4)
+        split.alignment = "RIGHT"
+
+        split.label(text="Camera controller")
+        split.prop(mytool, "controller", icon='SPHERE')
+        
+        # Add light controller
+                
+        box.operator("radialrenderer.add_light_controller", text="Add light controller")
 
 
 class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):

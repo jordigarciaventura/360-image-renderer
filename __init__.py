@@ -18,7 +18,7 @@ import bpy
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__))) # Add path to use absolute imports
 
-module_names = ["properties", "create_preset", "align_location", "align_rotation", "swap_align", "insert_keyframes", "export_marker_names", "ui_panels"]
+module_names = ["properties", "add_camera_controller", "add_light_controller", "align_location", "align_rotation", "swap_align", "insert_keyframes", "export_marker_names", "ui_panels"]
 
 for module_name in module_names:
   if module_name in sys.modules:
