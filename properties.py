@@ -24,7 +24,7 @@ import re
 
 # VARIABLES
 
-invalid_chars = '[\\\/\:\*\?"\<\>\|]'
+invalid_chars = '[\\\/\:\*\?\"\<\>\|]'
 
 # Errors
 
@@ -72,8 +72,6 @@ def unregister_icons():
 
 
 def validate_file_name(name):
-
-    global invalid_chars
     return not re.search(invalid_chars, name)
 
 
@@ -300,48 +298,28 @@ class MyProperties(bpy.types.PropertyGroup):
         return self.get("marker_name_preview", "V1H0")
 
     def get_views_count(self):
-        x = 0
-        y = 0
-        x_axis = self.get("x_axis", False)
-        y_axis = self.get("y_axis", False)
-
-        # Set x and y
-        if x_axis:
-            if self.get("x_mode", 0) == 0: # Turnaround
-                x = self.get("x_steps", 360)
-            else:
-                x = 1 + self.get("right_steps", 0) + self.get("left_steps", 0)
-        else:
-            x = 1
-
-        if y_axis:
-            if self.get("y_mode", 0) == 0: # Turnaround
-                y = self.get("y_steps", 360)
-            else:
-                y = 1 + self.get("up_steps", 0) + self.get("down_steps", 0)
-        else:
-            y = 1
-
-        # Calculate views count
-        if not x_axis and not y_axis:
-            return 1
-        elif x_axis and y_axis:
-            return int(x * y)
-        elif x_axis:
-            return int(x)
-        else:
-            return int(y)
+        x = 1
+        y = 1
+        
+        if self.x_axis:
+          if self.x_mode == 'TURNAROUND':
+            x = self.x_steps
+          else:
+            x += self.right_steps + self.left_steps
+        
+        if self.y_axis:
+          if self.y_mode == 'TURNAROUND':
+            y = self.y_steps
+          else:
+            y += self.up_steps + self.down_steps
+        
+        return x * y
 
       
     def get_frame_end(self):
       scene = bpy.context.scene
       return scene.frame_current + self.views_count - 1
       
-    def get_abs_path(self):
-        return self.get("path", "")
-
-    def set_abs_path(self, value):
-        self["path"] = bpy.path.abspath(value)
 
     # PROPERTY DEFINITIONS
 
