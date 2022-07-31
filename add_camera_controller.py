@@ -10,7 +10,7 @@ from mathutils import Vector
 from add_light_controller import add_light_controller
 
 # Creates a Camera Controller and 3 Light Controllers. Returns the object
-def add_camera_controller(context, location):
+def add_camera_controller(context, location, radius):
     scene = context.scene
 
     # Create collection
@@ -28,12 +28,13 @@ def add_camera_controller(context, location):
     cam_controller = bpy.data.objects.new("Camera Controller", None)
     cam_controller.empty_display_type = "SPHERE"
     cam_controller.location = location
+    cam_controller.scale = Vector((radius, radius, radius))
     coll.objects.link(cam_controller)
 
     # Create camera
     cam_data = bpy.data.cameras.new(name="Camera")
     cam = bpy.data.objects.new("Camera", cam_data)
-    cam.location = (0, -1, 0)
+    cam.location = location
     cam.rotation_euler = (radians(90), 0, 0)
     coll.objects.link(cam)
 
@@ -48,7 +49,6 @@ def add_camera_controller(context, location):
     light_transform.map_to = 'LOCATION'
     light_transform.map_to_z_from = 'Y'
     light_transform.to_max_z = 100000
-    light_transform.mix_mode = 'REPLACE'
 
     # Add 'Child of' constraint
     cam_child_of = cam.constraints.new('CHILD_OF')
@@ -70,7 +70,6 @@ def add_camera_controller(context, location):
 
     # LIGHT CONTROLLERS
     
-
     # Select controller
     for obj in context.selected_objects:
         obj.select_set(False)
@@ -89,26 +88,27 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
     bl_idname = "radialrenderer.add_camera_controller"
 
     def execute(self, context):
-
         scene = context.scene
         mytool = scene.my_tool
 
-        # Calculate controller spawn location
-        spawn_location = Vector()
-
         selected_objects = context.selected_objects
-        if len(selected_objects):
+
+        # Calculate spawn location        
+        spawn_location = Vector()
+        if selected_objects:
+            # Center point of all selected objects
             for obj in selected_objects:
                 spawn_location += obj.location
             spawn_location /= len(selected_objects)
         else:
             spawn_location = context.scene.cursor.location.copy()
 
-        # Set object reference
-        if len(selected_objects) == 1:
-            mytool.obj = context.selected_objects[0]
+        # Calculate radius
+        radius = 1
+        if selected_objects:
+          radius = max([(obj.location - spawn_location).magnitude for obj in selected_objects])
 
-        mytool.controller = mytool.from_obj = add_camera_controller(context, spawn_location)
+        mytool.controller = mytool.from_obj = add_camera_controller(context, spawn_location, radius)
 
         return {"FINISHED"}
 
