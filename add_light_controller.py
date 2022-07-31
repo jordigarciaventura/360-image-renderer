@@ -1,25 +1,21 @@
 import bpy
 
-from math import (
-    radians,
-    degrees,
-)
-
-from mathutils import Vector
-
 import properties as prop
 
-# Creates a Light Controller
-def add_light_controller(context, parent, rotation = Vector((0, 0, 0)), name = ""):
+from math import radians
+from mathutils import Vector
 
-    parent_rotation = Vector((parent.rotation_euler.x, parent.rotation_euler.y, parent.rotation_euler.z))
+
+# Creates a Light Controller
+def add_light_controller(context, parent):
+    parent_rotation = Vector(
+        (parent.rotation_euler.x, parent.rotation_euler.y, parent.rotation_euler.z))
 
     # Create light controller
-    controller_name = " ".join([name, "Light Controller"]).strip()
-    light_controller = bpy.data.objects.new(controller_name, None)
+    light_controller = bpy.data.objects.new("Light Controller", None)
     light_controller.empty_display_type = 'SPHERE'
     light_controller.location = parent.location
-    light_controller.rotation_euler = parent_rotation + rotation
+    light_controller.rotation_euler = parent_rotation
 
     # Add 'Child of' constraint
     light_child_of = light_controller.constraints.new('CHILD_OF')
@@ -29,9 +25,8 @@ def add_light_controller(context, parent, rotation = Vector((0, 0, 0)), name = "
     light_child_of.use_scale_z = False
 
     # Create light
-    light_name = " ".join([name,"Light"]).strip()
-    light_data = bpy.data.lights.new(light_name, type="AREA")
-    light = bpy.data.objects.new(light_name, light_data)
+    light_data = bpy.data.lights.new("Light", type="AREA")
+    light = bpy.data.objects.new("Light", light_data)
     light.location = parent.location
     light.rotation_euler = parent_rotation + Vector((radians(90), 0, 0))
 
@@ -46,7 +41,7 @@ def add_light_controller(context, parent, rotation = Vector((0, 0, 0)), name = "
     light_transform.map_to = 'LOCATION'
     light_transform.map_to_z_from = 'Y'
     light_transform.to_max_z = 100000
-    
+
     # Add 'Child of' constraint
     light_child_of = light.constraints.new('CHILD_OF')
     light_child_of.target = light_controller
@@ -61,19 +56,20 @@ def add_light_controller(context, parent, rotation = Vector((0, 0, 0)), name = "
     light.lock_rotation[0] = True
     light.lock_rotation[1] = True
     light.lock_rotation[2] = True
-  
+
     # Add objects to scene
     context.collection.objects.link(light_controller)
     context.collection.objects.link(light)
-    
+
     # Select controller
     for obj in context.selected_objects:
         obj.select_set(False)
 
     context.view_layer.objects.active = light_controller
     light_controller.select_set(True)
-    
+
     return light_controller
+
 
 class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
     """Add a pre-built light controller"""
@@ -102,10 +98,12 @@ class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
 
 classes = (RADIALRENDERER_OT_add_light_controller,)
 
+
 def register():
-  for cls in classes:
-    bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
 
 def unregister():
-  for cls in classes:
-    bpy.utils.unregister_class(cls)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
