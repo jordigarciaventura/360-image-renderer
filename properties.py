@@ -9,25 +9,19 @@ from bpy.props import (
     FloatProperty,
     PointerProperty,
     EnumProperty,
-    CollectionProperty,
 )
-
-from bpy.utils import previews
 
 from math import (
     radians,
     degrees,
 )
 
-import os
 import re
 
 # VARIABLES
-
 invalid_chars = '[\\\/\:\*\?\"\<\>\|]'
 
 # Errors
-
 marker_name_error = (
     "A marker name can't contain any of these characters: \n" + '\\ / : * ? " < > |'
 )
@@ -45,8 +39,6 @@ frames_renderer_msg = "360 RENDERER: %s/%s frames rendered\n"
 
 
 # FUNCTIONS
-
-
 def validate_file_name(name):
     return not re.search(invalid_chars, name)
 
@@ -56,22 +48,17 @@ def is_in_view_layer(self, object):
 
 
 # PROPERTIES
-
-
 class MyProperties(bpy.types.PropertyGroup):
 
     # GETTER/SETTER
-
     # Horizontal Axis
-
     def set_x_mode(self, value):
-      self["x_mode"] = value
+        self["x_mode"] = value
 
     def get_x_mode(self):
-      return self.get("x_mode", 0)
+        return self.get("x_mode", 0)
 
     # Turn Around
-
     def get_x_steps(self):
         return self.get("x_steps", 360)
 
@@ -87,7 +74,6 @@ class MyProperties(bpy.types.PropertyGroup):
         self["x_clamped_angle"] = radians(360 / self["x_steps"])
 
     # Custom
-
     def get_x_angle(self):
         return self.get("x_angle", radians(1))
 
@@ -163,15 +149,13 @@ class MyProperties(bpy.types.PropertyGroup):
         )
 
     # Vertical Axis
-
     def set_y_mode(self, value):
-      self["y_mode"] = value
+        self["y_mode"] = value
 
     def get_y_mode(self):
-      return self.get("y_mode", 'TURNAROUND')
-    
-    # Turn Around
+        return self.get("y_mode", 'TURNAROUND')
 
+    # Turn Around
     def get_y_steps(self):
         return self.get("y_steps", 360)
 
@@ -187,7 +171,6 @@ class MyProperties(bpy.types.PropertyGroup):
         self["y_clamped_angle"] = radians(360 / self["y_steps"])
 
     # Custom
-
     def get_y_angle(self):
         return self.get("y_angle", radians(1))
 
@@ -262,13 +245,13 @@ class MyProperties(bpy.types.PropertyGroup):
         )
 
     # Create keyframes
-
     def get_marker_name(self):
         return self.get("marker_name", "V{V}H{H}")
 
     def set_marker_name(self, value):
         self["marker_name"] = value
-        self["marker_name_preview"] = value.replace("{H}", "0", 1).replace("{V}", "1", 1)
+        self["marker_name_preview"] = value.replace(
+            "{H}", "0", 1).replace("{V}", "1", 1)
 
     def get_marker_name_preview(self):
         return self.get("marker_name_preview", "V1H0")
@@ -276,31 +259,28 @@ class MyProperties(bpy.types.PropertyGroup):
     def get_views_count(self):
         x = 1
         y = 1
-        
+
         if self.x_axis:
-          if self.x_mode == 'TURNAROUND':
-            x = self.x_steps
-          else:
-            x += self.right_steps + self.left_steps
-        
+            if self.x_mode == 'TURNAROUND':
+                x = self.x_steps
+            else:
+                x += self.right_steps + self.left_steps
+
         if self.y_axis:
-          if self.y_mode == 'TURNAROUND':
-            y = self.y_steps
-          else:
-            y += self.up_steps + self.down_steps
-        
+            if self.y_mode == 'TURNAROUND':
+                y = self.y_steps
+            else:
+                y += self.up_steps + self.down_steps
+
         return x * y
 
-      
     def get_frame_end(self):
-      scene = bpy.context.scene
-      return scene.frame_current + self.views_count - 1
-      
+        scene = bpy.context.scene
+        return scene.frame_current + self.views_count - 1
 
     # PROPERTY DEFINITIONS
 
     # Setup
-
     controller: PointerProperty(
         type=bpy.types.Object,
         name="",
@@ -315,7 +295,7 @@ class MyProperties(bpy.types.PropertyGroup):
         description="Object to align from",
         poll=is_in_view_layer,
     )
-    
+
     to_obj: PointerProperty(
         type=bpy.types.Object,
         name="",
@@ -324,8 +304,7 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Keyframe Assistant
-
-    key_obj : PointerProperty(
+    key_obj: PointerProperty(
         type=bpy.types.Object,
         name="",
         description="Object to insert rotation keyframes",
@@ -333,7 +312,6 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # X Turnaround
-
     x_axis: BoolProperty(
         name="",
         default=False,
@@ -356,13 +334,13 @@ class MyProperties(bpy.types.PropertyGroup):
     x_mode: EnumProperty(
         name="Rotation mode",
         items={
-          ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
-          ('MANUAL', "Manual", "Manual mode", 1)},
+            ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
+            ('MANUAL', "Manual", "Manual mode", 1)},
         default='TURNAROUND',
         get=get_x_mode,
         set=set_x_mode
     )
-    
+
     x_steps: IntProperty(
         name="",
         min=1,
@@ -375,7 +353,6 @@ class MyProperties(bpy.types.PropertyGroup):
     x_steps_max: IntProperty()
 
     # Y Turnaround
-
     y_axis: BoolProperty(
         name="",
         default=False,
@@ -398,8 +375,8 @@ class MyProperties(bpy.types.PropertyGroup):
     y_mode: EnumProperty(
         name="Rotation mode",
         items={
-          ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
-          ('MANUAL', "Manual", "Manual mode", 1)},
+            ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
+            ('MANUAL', "Manual", "Manual mode", 1)},
         default='MANUAL',
         get=get_y_mode,
         set=set_y_mode
@@ -417,7 +394,6 @@ class MyProperties(bpy.types.PropertyGroup):
     y_steps_max: IntProperty()
 
     # X Custom
-
     x_angle: FloatProperty(
         name="",
         description="Angle of each step in Z",
@@ -465,7 +441,6 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Y Custom
-
     y_angle: FloatProperty(
         name="",
         description="Angle of each step in X",
@@ -513,7 +488,6 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Insert keyframes
-
     views_count: IntProperty(
         default=1,
         get=get_views_count,
@@ -539,13 +513,12 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     frame_end: IntProperty(
-      name="",
-      description="End frame from last keyframe",
-      get=get_frame_end,
+        name="",
+        description="End frame from last keyframe",
+        get=get_frame_end,
     )
 
     # Render
-
     only_selected: BoolProperty(
         name="",
         description="Hide/Show non-selected renderable objects in viewport and in render",
@@ -558,10 +531,12 @@ classes = (
     MyProperties,
 )
 
+
 def register():
-  for cls in classes:
-    bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
 
 def unregister():
-  for cls in classes:
-    bpy.utils.unregister_class(cls)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
