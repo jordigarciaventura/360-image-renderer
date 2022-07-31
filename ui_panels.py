@@ -23,25 +23,22 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel, RADIALRENDERER_panel):
         col = layout.column()
 
         # Add camera controller
-
         sub = col.row()
-        sub.scale_y = 1.2
-        sub.operator("radialrenderer.add_camera_controller", text="Add camera controller")
+        sub.scale_y = 1.5
+        sub.operator("radialrenderer.add_camera_controller", text="Add camera controller", icon='OUTLINER_OB_CAMERA')
 
         col.separator()
 
         # Controller
-
         box = col.box()
 
         split = box.split(align=True, factor=0.4)
         split.alignment = "RIGHT"
 
         split.label(text="Camera controller")
-        split.prop(mytool, "controller", icon='SPHERE')
+        split.prop(mytool, "controller", icon='OUTLINER_DATA_CAMERA')
         
-        # Add light controller
-                
+        # Add light controller                
         box.operator("radialrenderer.add_light_controller", text="Add light controller")
 
 
@@ -74,8 +71,10 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         sub.operator("radialrenderer.swap_align", text="Swap")
                 
         col.separator(factor=1)
-        col.operator("radialrenderer.align_location", text="Align Location")
-        col.operator("radialrenderer.align_rotation", text="Align Rotation")
+        sub = col.column()
+        sub.scale_y = 1.5
+        sub.operator("radialrenderer.align_location", text="Align Location", icon="EMPTY_AXIS")
+        sub.operator("radialrenderer.align_rotation", text="Align Rotation", icon="ORIENTATION_GIMBAL")
  
 
 class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel):
@@ -158,7 +157,7 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
         split.prop(mytool, "marker_name")
         split = sub.split(factor=0.2)
         split.alignment = 'RIGHT'
-        split.label(text="Preview")
+        split.label(text="")
         split.prop(mytool, "marker_name_preview")
 
         col.separator(factor=2)
@@ -217,12 +216,12 @@ class RADIALRENDERER_PT_render(bpy.types.Panel, RADIALRENDERER_panel):
         row = col.row()
         row.scale_y = 1.5
 
-        frame_count = scene.frame_end - scene.frame_start
+        frame_count = 1 + scene.frame_end - scene.frame_start
 
         row.operator(
             "radialrenderer.export",
             text="Render {} frame{}".format(frame_count, "s" if frame_count != 1 else ""),
-            icon_value=prop.icons["frames"].icon_id,
+            icon='RENDER_ANIMATION'
         )
 
 
