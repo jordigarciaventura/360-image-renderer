@@ -67,8 +67,9 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         row = grid.row()
         row.operator(
           "radialrenderer.swap_align",
-          text="Swap",
-          icon='ARROW_LEFTRIGHT'
+          text="",
+          icon='ARROW_LEFTRIGHT',
+          emboss=False
         )
         
         grid.label(text="To")
