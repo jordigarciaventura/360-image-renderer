@@ -35,11 +35,9 @@ def register():
           module.register()
           
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=sys.modules["properties"].MyProperties)
-    sys.modules["properties"].register_icons()
 
 
 def unregister():
-    sys.modules["properties"].unregister_icons()
     del bpy.types.Scene.my_tool
     
     for module_name in reversed(module_names):

@@ -43,30 +43,6 @@ render_started_msg = "360 RENDERER: render started\n"
 render_finished_msg = "360 RENDERER: render finished\n"
 frames_renderer_msg = "360 RENDERER: %s/%s frames rendered\n"
 
-# Icons
-icons = None
-
-
-def register_icons():
-
-    global icons
-
-    icons = bpy.utils.previews.new()
-    icons_dir = os.path.join(os.path.dirname(__file__), "icons")
-
-    icon_names = os.listdir(icons_dir)
-
-    for icon in icon_names:
-        icons.load(icon[:-4], os.path.join(icons_dir, icon), "IMAGE")
-
-
-def unregister_icons():
-
-    global icons
-
-    if icons:
-        bpy.utils.previews.remove(icons)
-
 
 # FUNCTIONS
 
