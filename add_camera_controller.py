@@ -67,8 +67,6 @@ def add_camera_controller(context, location, radius):
     cam.lock_scale[0] = True
     cam.lock_scale[1] = True
     cam.lock_scale[2] = True
-
-    # LIGHT CONTROLLERS
     
     # Select controller
     for obj in context.selected_objects:
