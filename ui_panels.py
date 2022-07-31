@@ -91,7 +91,10 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
         col = layout.column()
 
         # Object
-        col.prop(mytool, "key_obj", text="Object")
+        split = col.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="Object")
+        split.prop(mytool, "key_obj")
 
         col.separator()
         
@@ -149,8 +152,14 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
 
         sub = col.column(align=True)
         sub.label(text="Marker names")
-        sub.prop(mytool, "marker_name", text="Format")
-        sub.prop(mytool, "marker_name_preview", text="Preview")
+        split = sub.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="Format")
+        split.prop(mytool, "marker_name")
+        split = sub.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="Preview")
+        split.prop(mytool, "marker_name_preview")
 
         col.separator(factor=2)
 
