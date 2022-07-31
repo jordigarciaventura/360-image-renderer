@@ -16,6 +16,7 @@ def add_light_controller(context, parent):
     light_controller.empty_display_type = 'SPHERE'
     light_controller.location = parent.location
     light_controller.rotation_euler = parent_rotation
+    light_controller.scale = parent.scale * 0.8
 
     # Add 'Child of' constraint
     light_child_of = light_controller.constraints.new('CHILD_OF')
@@ -29,6 +30,7 @@ def add_light_controller(context, parent):
     light = bpy.data.objects.new("Light", light_data)
     light.location = parent.location
     light.rotation_euler = parent_rotation + Vector((radians(90), 0, 0))
+    light.scale = light_controller.scale * 4
 
     # Add 'Transform' constraint
     light_transform = light.constraints.new('TRANSFORM')
