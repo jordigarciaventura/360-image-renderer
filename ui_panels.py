@@ -1,3 +1,4 @@
+from cgitb import text
 import bpy
 
 import properties as prop
@@ -79,7 +80,7 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         col.operator("radialrenderer.align_location", text="Align Location")
         col.separator(factor=1)
         col.operator("radialrenderer.align_rotation", text="Align Rotation")
-
+ 
 
 class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel):
     bl_label = "Keyframe Assistant"
@@ -87,150 +88,89 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
     bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
-
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
 
+        col = layout.column()
+
+        # Object
+        col.prop(mytool, "key_obj", text="Object")
+
+        col.separator()
+        
+        col.label(text="Keyframes")
         # Horizontal Axis
-
-        row = layout.split(factor=0.7, align=True)
-        row.alignment = "LEFT"
-
-        row.prop(mytool, "x_axis", text="Horizontal Axis")
-        row.prop(mytool, "x_rotation_axis", text="")
-
-        # Turn Around
+        box = col.box()
+        
+        split = box.split(factor=0.7, align=True)
+        row = split.row(align=True)
+        row.prop(mytool, "x_axis") 
+        row.label(text="Horizontal Axis")
+        split.prop(mytool, "x_rotation_axis", text="")
+        
         if mytool.x_axis:
+          box.row().prop(mytool, "x_mode", expand=True)
+          subcol = box.column(align=True)
+          # Parts/Angle
+          if mytool.x_mode == 'TURNAROUND':
+              subcol.prop(mytool, "x_clamped_angle", text="Angle")
+              subcol.prop(mytool, "x_steps", text="Parts")
+          # Angle/LeftSteps/RightSteps
+          else:
+              subcol.prop(mytool, "x_angle", text="Angle")
+              subcol.prop(mytool, "left_steps", text="Left Steps")
+              subcol.prop(mytool, "right_steps", text="Right Steps")
 
-            box = layout.box()
-
-            row = box.row(align=True)
-            row.alignment = "RIGHT"
-
-            row.label(icon_value=prop.icons["turnaround"].icon_id, text="Turn Around")
-            row.prop(mytool, "x_turnaround")
-
-            # Parts/Angle
-            if mytool.x_turnaround:
-
-                box.separator(factor=2.25)
-                row = box.row(align=True)
-
-                row1 = row.row()
-                row1.alignment = "CENTER"
-                row1.label(icon_value=prop.icons["parts"].icon_id, text="Parts")
-
-                row2 = row.row()
-                row2.alignment = "CENTER"
-                row2.label(icon_value=prop.icons["angle"].icon_id, text="Angle")
-
-                row = box.row(align=True)
-                row.prop(mytool, "x_steps")
-                row.prop(mytool, "x_clamped_angle")
-
-            # Angle/RightSteps/LeftSteps
-            else:
-                box = layout.box()
-                col = box.column(align=True)
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["angle"].icon_id, text="Angle")
-                row.prop(mytool, "x_angle")
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["right"].icon_id, text="Right Steps")
-                row.prop(mytool, "right_steps")
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["left"].icon_id, text="Left Steps")
-                row.prop(mytool, "left_steps")
-
-            layout.separator(factor=1)
-
-        # Vertical Axis
-        row = layout.split(factor=0.7, align=True)
-        row.alignment = "LEFT"
-
-        row.prop(mytool, "y_axis", text="Vertical Axis")
-        row.prop(mytool, "y_rotation_axis", text="")
-
-        # Turn Around
+        # Vertical Axis     
+        box = col.box()
+                
+        split = box.split(factor=0.7, align=True)
+        row = split.row(align=True)
+        row.prop(mytool, "y_axis") 
+        row.label(text="Vertical Axis")
+        split.prop(mytool, "y_rotation_axis", text="")
+                                      
         if mytool.y_axis:
+                
+          box.row().prop(mytool, "y_mode", expand=True)
 
-            box = layout.box()
+          subcol = box.column(align=True)
 
-            row = box.row(align=True)
-            row.alignment = "RIGHT"
+          # Parts/Angle
+          if mytool.y_mode == 'TURNAROUND':
+              subcol.prop(mytool, "y_clamped_angle", text="Angle")
+              subcol.prop(mytool, "y_steps", text="Parts")
 
-            row.label(icon_value=prop.icons["turnaround"].icon_id, text="Turn Around")
-            row.prop(mytool, "y_turnaround")
-
-            # Parts/Angle
-            if mytool.y_turnaround:
-
-                box.separator(factor=2.25)
-                row = box.row(align=True)
-
-                row1 = row.row()
-                row1.alignment = "CENTER"
-                row1.label(icon_value=prop.icons["parts"].icon_id, text="Parts")
-
-                row2 = row.row()
-                row2.alignment = "CENTER"
-                row2.label(icon_value=prop.icons["angle"].icon_id, text="Angle")
-
-                row = box.row(align=True)
-                row.prop(mytool, "y_steps")
-                row.prop(mytool, "y_clamped_angle")
-
-            # Angle/UpSteps/DownSteps
-            else:
-                box = layout.box()
-                col = box.column(align=True)
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["angle"].icon_id, text="Angle")
-                row.prop(mytool, "y_angle")
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["up"].icon_id, text="Up Steps")
-                row.prop(mytool, "up_steps")
-
-                row = col.split(factor=0.5, align=True)
-                row.alignment = "RIGHT"
-                row.label(icon_value=prop.icons["down"].icon_id, text="Down Steps")
-                row.prop(mytool, "down_steps")
-
+          # Angle/UpSteps/DownSteps
+          else:
+              subcol.prop(mytool, "y_angle", text="Angle")
+              subcol.prop(mytool, "up_steps", text="Up Steps")
+              subcol.prop(mytool, "down_steps", text="Down Steps")        
+        
         # Markers name
+        col.separator()
 
-        layout.separator(factor=4)
+        col.label(text="Marker names")
+        split = col.split(factor=0.6, align=True)
+        split.prop(mytool, "marker_name")
+        split.prop(mytool, "marker_name_preview")
 
-        row = layout.split(factor=0.6, align=True)
-        row.prop(mytool, "marker_name")
-        row.prop(mytool, "marker_name_preview")
+        col.separator(factor=2)
 
-        # Views count
-
-        layout.separator(factor=1)
-
-        row = layout.row(align=True)
-        row.alignment = "RIGHT"
-        row.label(text="Views count: " + str(mytool.views_count))
+        row = col.row(align=True)
+        row.prop(scene, "frame_current", text="Start")
+        row.prop(mytool, "frame_end", text="End")
 
         # Insert keyframes
+        col.separator()
 
-        row = layout.row()
+        row = col.row()
         row.scale_y = 1.5
         row.operator(
             "radialrenderer.insert_keyframes",
-            text="Insert keyframes",
-            icon_value=prop.icons["keyframe"].icon_id,
+            text="Insert {} {}".format(str(mytool.views_count), "keyframes" if mytool.views_count > 1 else "keyframe"),
+            icon='DECORATE_KEYFRAME',
         )
 
 
@@ -250,7 +190,8 @@ class RADIALRENDERER_PT_render(bpy.types.Panel, RADIALRENDERER_panel):
         layout.scale_y = 1
 
         row = layout.row()
-        row.prop(mytool, "path")
+        
+        row.prop(scene.render, "filepath", text="")
 
         # Only selected
 

@@ -20,7 +20,6 @@ from math import (
 )
 
 import os
-import glob
 import re
 
 # VARIABLES
@@ -100,6 +99,12 @@ class MyProperties(bpy.types.PropertyGroup):
 
     # Horizontal Axis
 
+    def set_x_mode(self, value):
+      self["x_mode"] = value
+
+    def get_x_mode(self):
+      return self.get("x_mode", 0)
+
     # Turn Around
 
     def get_x_steps(self):
@@ -157,7 +162,7 @@ class MyProperties(bpy.types.PropertyGroup):
             self["right_steps"] = right_steps_new
 
     def get_right_steps(self):
-        return self.get("right_steps", 0)
+        return int(self.get("right_steps", 0))
 
     def set_right_steps(self, value):
 
@@ -194,6 +199,12 @@ class MyProperties(bpy.types.PropertyGroup):
 
     # Vertical Axis
 
+    def set_y_mode(self, value):
+      self["y_mode"] = value
+
+    def get_y_mode(self):
+      return self.get("y_mode", 'TURNAROUND')
+    
     # Turn Around
 
     def get_y_steps(self):
@@ -277,10 +288,10 @@ class MyProperties(bpy.types.PropertyGroup):
         # Clamp value to max steps
         value = max(0, min(value, y_steps_max))
 
-        # Change left steps
+        # Change down steps
         self["down_steps"] = value
 
-        # Clamp right steps with the rest
+        # Clamp up   steps with the rest
         self["up_steps"] = max(
             0, min(self["up_steps"], y_steps_max - self["down_steps"])
         )
@@ -308,42 +319,46 @@ class MyProperties(bpy.types.PropertyGroup):
         return self.get("marker_name_preview", "V1H0")
 
     def get_views_count(self):
-
         x = 0
         y = 0
+        x_axis = self.get("x_axis", False)
+        y_axis = self.get("y_axis", False)
 
         # Set x and y
-        if self["x_axis"]:
-            if self["x_turnaround"]:
-                x = self["x_steps"]
+        if x_axis:
+            if self.get("x_mode", 0) == 0: # Turnaround
+                x = self.get("x_steps", 360)
             else:
-                x = 1 + self["right_steps"] + self["left_steps"]
+                x = 1 + self.get("right_steps", 0) + self.get("left_steps", 0)
         else:
             x = 1
 
-        if self["y_axis"]:
-            if self["y_turnaround"]:
-                y = self["y_steps"]
+        if y_axis:
+            if self.get("y_mode", 0) == 0: # Turnaround
+                y = self.get("y_steps", 360)
             else:
-                y = 1 + self["up_steps"] + self["down_steps"]
+                y = 1 + self.get("up_steps", 0) + self.get("down_steps", 0)
         else:
             y = 1
 
         # Calculate views count
-        if not (self["x_axis"]) and not (self["y_axis"]):
+        if not x_axis and not y_axis:
             return 1
-        elif self["x_axis"] and self["y_axis"]:
-            return x * y
-        elif self["x_axis"]:
-            return x
+        elif x_axis and y_axis:
+            return int(x * y)
+        elif x_axis:
+            return int(x)
         else:
-            return y
+            return int(y)
 
     def get_frames_count(self):
-
         scene = bpy.context.scene
         return 1 + scene.frame_end - scene.frame_start
-
+      
+    def get_frame_end(self):
+      scene = bpy.context.scene
+      return scene.frame_current + self.views_count - 1
+      
     def get_abs_path(self):
         return self.get("path", "")
 
@@ -359,19 +374,6 @@ class MyProperties(bpy.types.PropertyGroup):
         name="",
         description="Controller to rotate",
         poll=is_in_view_layer,
-    )
-
-    obj: PointerProperty(
-        type=bpy.types.Object,
-        name="",
-        description="Object to align",
-        poll=is_in_view_layer,
-    )
-
-    controller_to_obj: BoolProperty(
-        name="",
-        description="Alignment direction",
-        default=True,
     )
 
     # Align
@@ -390,6 +392,13 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Keyframe Assistant
+
+    key_obj : PointerProperty(
+        type=bpy.types.Object,
+        name="",
+        description="Object to insert rotation keyframes",
+        poll=is_in_view_layer,
+    )
 
     # X Turnaround
 
@@ -412,10 +421,16 @@ class MyProperties(bpy.types.PropertyGroup):
         default="Z",
     )
 
-    x_turnaround: BoolProperty(
-        name="",
-        default=False,
+    x_mode: EnumProperty(
+        name="Rotation mode",
+        items={
+          ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
+          ('MANUAL', "Manual", "Manual mode", 1)},
+        default='TURNAROUND',
+        get=get_x_mode,
+        set=set_x_mode
     )
+    
     x_steps: IntProperty(
         name="",
         min=1,
@@ -448,9 +463,14 @@ class MyProperties(bpy.types.PropertyGroup):
         default="X",
     )
 
-    y_turnaround: BoolProperty(
-        name="",
-        default=False,
+    y_mode: EnumProperty(
+        name="Rotation mode",
+        items={
+          ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
+          ('MANUAL', "Manual", "Manual mode", 1)},
+        default='MANUAL',
+        get=get_y_mode,
+        set=set_y_mode
     )
 
     y_steps: IntProperty(
@@ -586,17 +606,13 @@ class MyProperties(bpy.types.PropertyGroup):
         get=get_marker_name_preview,
     )
 
-    # Render
-
-    path: StringProperty(
-        name="",
-        description="Path to save the frames",
-        default="",
-        maxlen=1024,
-        subtype="DIR_PATH",
-        get=get_abs_path,
-        set=set_abs_path,
+    frame_end: IntProperty(
+      name="",
+      description="End frame from last keyframe",
+      get=get_frame_end,
     )
+
+    # Render
 
     hidden_objects: CollectionProperty(type=Obj)
 

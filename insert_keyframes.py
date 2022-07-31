@@ -81,10 +81,10 @@ def rotate_and_add_marker(
                 x_value = str(signed_x)
                 y_value = str(signed_y)
 
-                if not mytool.x_turnaround and signed_x > 0:
+                if not mytool.x_mode == 'TURNAROUND' and signed_x > 0:
                     x_value = "+" + x_value
 
-                if not mytool.y_turnaround and signed_y > 0:
+                if not mytool.y_mode == 'TURNAROUND' and signed_y > 0:
                     y_value = "+" + y_value
 
                 marker_name = marker_namerule
@@ -158,7 +158,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
 
         if mytool.x_axis and mytool.y_axis:
 
-            if mytool.x_turnaround and mytool.y_turnaround:
+            if mytool.x_mode == 'TURNAROUND' and mytool.y_mode == 'TURNAROUND':
 
                 # Use y_steps and x_steps
                 rotate_and_add_marker(
@@ -172,7 +172,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
                     mytool.marker_name,
                 )
 
-            elif mytool.x_turnaround:
+            elif mytool.x_mode == 'TURNAROUND':
 
                 # Use x_steps and up/down steps
                 rotate_and_add_marker(
@@ -196,7 +196,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
                     mytool.marker_name,
                 )
 
-            elif mytool.y_turnaround:
+            elif mytool.y_mode == 'TURNAROUND':
 
                 # Use y_steps and right/left steps
                 rotate_and_add_marker(
@@ -266,7 +266,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
 
         elif mytool.x_axis:
 
-            if mytool.x_turnaround:
+            if mytool.x_mode == 'TURNAROUND':
 
                 # Use x_steps
                 rotate_and_add_marker(
@@ -306,7 +306,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
 
         elif mytool.y_axis:
 
-            if mytool.y_turnaround:
+            if mytool.y_mode == 'TURNAROUND':
 
                 # Use y_steps
                 rotate_and_add_marker(
