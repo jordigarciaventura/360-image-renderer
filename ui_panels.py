@@ -57,28 +57,22 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
 
         col = layout.column()
         
-        # From <> To
-        
         box = col.box()
 
-        grid = box.grid_flow(columns=3)
-        
-        grid.label(text="From")
-        grid.prop(mytool, "from_obj")
-        
-        grid.separator()
-        grid.operator(
-          "radialrenderer.swap_align",
-          text="",
-          icon='ARROW_LEFTRIGHT',
-          emboss=False
-        )
-        
-        grid.label(text="To")
-        grid.prop(mytool, "to_obj")
-        
-        # Location and Rotation
-        
+        sub = box.column(align=True)
+
+        split = sub.split(factor=0.2)
+        split.alignment='RIGHT'
+        split.label(text="From")
+        split.prop(mytool, "from_obj")
+        sub.separator()
+        split = sub.split(factor=0.2)
+        split.alignment='RIGHT'
+        split.label(text="To")
+        split.prop(mytool, "to_obj")
+        sub.separator(factor=2)
+        sub.operator("radialrenderer.swap_align", text="Swap")
+                
         col.separator(factor=1)
         col.operator("radialrenderer.align_location", text="Align Location")
         col.operator("radialrenderer.align_rotation", text="Align Rotation")
