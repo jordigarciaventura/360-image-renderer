@@ -106,7 +106,8 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
         # Calculate radius
         radius = 1
         if selected_objects:
-          radius = max([(obj.location - spawn_location).magnitude for obj in selected_objects])
+          max_distance = max([(obj.location - spawn_location).magnitude for obj in selected_objects])
+          radius = max(radius, max_distance)
 
         mytool.controller = mytool.from_obj = add_camera_controller(context, spawn_location, radius)
 
