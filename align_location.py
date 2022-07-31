@@ -13,23 +13,24 @@ class RADIALRENDERER_OT_align_location(bpy.types.Operator):
     bl_label = "Align"
     bl_idname = "radialrenderer.align_location"
 
+    @classmethod
+    def poll(self, context):
+        scene = context.scene
+        mytool = scene.my_tool
+        
+        if not prop.is_in_view_layer(self, mytool.from_obj):
+          return False
+        if not prop.is_in_view_layer(self, mytool.to_obj):
+          return False
+        
+        return True 
+
     def execute(self, context):
 
         scene = context.scene
         mytool = scene.my_tool
 
-        # Check dependencies
-
-        if not prop.is_in_view_layer(self, mytool.from_obj):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "From")
-            return {"FINISHED"}
-
-        if not prop.is_in_view_layer(self, mytool.to_obj):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "To")
-            return {"FINISHED"}
-
         # Align location
-
         align_location(mytool.from_obj, mytool.to_obj)
 
         return {"FINISHED"}

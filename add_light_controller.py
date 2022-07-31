@@ -73,7 +73,7 @@ class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
     bl_idname = "radialrenderer.add_light_controller"
 
     @classmethod
-    def poll(cls, context):
+    def poll(self, context):
         scene = context.scene
         mytool = scene.my_tool
         return bool(mytool.controller)
