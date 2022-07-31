@@ -109,7 +109,7 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
           else:
             radius = 2 * max([(obj.location - spawn_location).magnitude for obj in selected_objects])
 
-        mytool.controller = mytool.from_obj = add_camera_controller(context, spawn_location, radius)
+        mytool.controller = mytool.from_obj = mytool.key_obj = add_camera_controller(context, spawn_location, radius)
 
         return {"FINISHED"}
 
