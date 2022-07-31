@@ -10,13 +10,16 @@ from mathutils import Vector
 import properties as prop
 
 # Creates a Light Controller
-def add_light_controller(context, parent, rotation = (0, 0, 0), name = ""):
+def add_light_controller(context, parent, rotation = Vector((0, 0, 0)), name = ""):
+
+    parent_rotation = Vector((parent.rotation_euler.x, parent.rotation_euler.y, parent.rotation_euler.z))
 
     # Create light controller
     controller_name = " ".join([name, "Light Controller"]).strip()
     light_controller = bpy.data.objects.new(controller_name, None)
     light_controller.empty_display_type = 'SPHERE'
-    light_controller.rotation_euler = rotation
+    light_controller.location = parent.location
+    light_controller.rotation_euler = parent_rotation + rotation
 
     # Add 'Child of' constraint
     light_child_of = light_controller.constraints.new('CHILD_OF')
@@ -29,8 +32,8 @@ def add_light_controller(context, parent, rotation = (0, 0, 0), name = ""):
     light_name = " ".join([name,"Light"]).strip()
     light_data = bpy.data.lights.new(light_name, type="AREA")
     light = bpy.data.objects.new(light_name, light_data)
-    light.location = (0, -1, 0)
-    light.rotation_euler = (radians(90), 0, 0)
+    light.location = parent.location
+    light.rotation_euler = parent_rotation + Vector((radians(90), 0, 0))
 
     # Add 'Transform' constraint
     light_transform = light.constraints.new('TRANSFORM')
@@ -43,7 +46,6 @@ def add_light_controller(context, parent, rotation = (0, 0, 0), name = ""):
     light_transform.map_to = 'LOCATION'
     light_transform.map_to_z_from = 'Y'
     light_transform.to_max_z = 100000
-    light_transform.mix_mode = 'REPLACE'
     
     # Add 'Child of' constraint
     light_child_of = light.constraints.new('CHILD_OF')
@@ -63,6 +65,13 @@ def add_light_controller(context, parent, rotation = (0, 0, 0), name = ""):
     # Add objects to scene
     context.collection.objects.link(light_controller)
     context.collection.objects.link(light)
+    
+    # Select controller
+    for obj in context.selected_objects:
+        obj.select_set(False)
+
+    context.view_layer.objects.active = light_controller
+    light_controller.select_set(True)
     
     return light_controller
 
