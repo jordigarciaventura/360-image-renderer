@@ -34,8 +34,6 @@ marker_name_error = (
 not_in_view_layer_error = "The %s is not in the View Layer"
 no_selected_error = "No %s selected"
 project_not_saved_error = "The project is not saved"
-marker_name_h_missing_error = "Use %H in Marker name or disable Horizontal Axis"
-marker_name_v_missing_error = "Use %V in Marker name or disable Vertical Axis"
 path_empty_error = "Select a path to save the frames"
 no_active_camera_error = "There is no active camera"
 markers_names_named_error = "Not all frames within the render range have a named marker"
@@ -299,21 +297,11 @@ class MyProperties(bpy.types.PropertyGroup):
     # Create keyframes
 
     def get_marker_name(self):
-        return self.get("marker_name", "V%VH%H")
+        return self.get("marker_name", "V{V}H{H}")
 
     def set_marker_name(self, value):
-
-        global marker_name
-        global marker_name_preview
-
-        if not value:
-            marker_name = "No marker name"
-            marker_name_preview = ""
-        else:
-            marker_name = value
-            marker_name_preview = value
-            marker_name_preview = marker_name_preview.replace("%V", "1")
-            marker_name_preview = marker_name_preview.replace("%H", "0")
+        self["marker_name"] = value
+        self["marker_name_preview"] = value.replace("{H}", "0", 1).replace("{V}", "1", 1)
 
     def get_marker_name_preview(self):
         return self.get("marker_name_preview", "V1H0")
@@ -589,8 +577,8 @@ class MyProperties(bpy.types.PropertyGroup):
 
     marker_name: StringProperty(
         name="",
-        description="Markers name (use %H and %V for horizontal and vertical values)",
-        default="No marker name",
+        description="Marker names (use {H} and {V} for horizontal and vertical values)",
+        default="H{H}V{V}",
         maxlen=1024,
         subtype="FILE_NAME",
         get=get_marker_name,

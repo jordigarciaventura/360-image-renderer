@@ -151,10 +151,10 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
         # Markers name
         col.separator()
 
-        col.label(text="Marker names")
-        split = col.split(factor=0.6, align=True)
-        split.prop(mytool, "marker_name")
-        split.prop(mytool, "marker_name_preview")
+        sub = col.column(align=True)
+        sub.label(text="Marker names")
+        sub.prop(mytool, "marker_name", text="Format")
+        sub.prop(mytool, "marker_name_preview", text="Preview")
 
         col.separator(factor=2)
 

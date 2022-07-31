@@ -88,8 +88,8 @@ def rotate_and_add_marker(
                     y_value = "+" + y_value
 
                 marker_name = marker_namerule
-                marker_name = marker_name.replace("%H", x_value)
-                marker_name = marker_name.replace("%V", y_value)
+                marker_name = marker_name.replace("{H}", x_value)
+                marker_name = marker_name.replace("{V}", y_value)
 
                 scene.timeline_markers.new(marker_name, frame=scene.frame_current)
 
@@ -103,6 +103,10 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
     bl_label = "Create Keyframes"
     bl_idname = "radialrenderer.insert_keyframes"
 
+    @classmethod
+    def poll(self, cls):
+      
+
     def execute(self, context):
 
         scene = context.scene
@@ -112,36 +116,21 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         global views
 
         # Check dependencies
-
-        if mytool.controller is None:
-            self.report({"ERROR"}, prop.no_selected_error % "Controller")
+        if mytool.key_obj is None:
+            self.report({"ERROR"}, prop.no_selected_error % "Key Object")
             return {"FINISHED"}
 
-        if mytool.controller not in set(bpy.context.scene.objects):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "Controller")
+        if mytool.key_obj not in set(bpy.context.scene.objects):
+            self.report({"ERROR"}, prop.not_in_view_layer_error % "Key Object")
             return {"FINISHED"}
 
         # Validation
-
         name = mytool.marker_name
 
-        if name != "No marker name":
-
+        if name:
             if not prop.validate_file_name(name):
                 self.report({"ERROR"}, prop.marker_name_error)
                 return {"FINISHED"}
-
-            if mytool.x_axis:
-                if "%H" not in name:
-
-                    self.report({"ERROR"}, prop.marker_name_h_missing_error)
-                    return {"FINISHED"}
-
-            if mytool.y_axis:
-                if "%V" not in name:
-
-                    self.report({"ERROR"}, prop.marker_name_v_missing_error)
-                    return {"FINISHED"}
 
         obj = mytool.controller
 
@@ -149,7 +138,6 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         scene.frame_start = scene.frame_current
 
         # Rotate objects
-
         global initialized
         initialized = False
 
