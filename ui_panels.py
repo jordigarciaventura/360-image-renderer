@@ -24,7 +24,9 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel, RADIALRENDERER_panel):
 
         # Add camera controller
 
-        col.operator("radialrenderer.add_camera_controller", text="Add camera controller")
+        sub = col.row()
+        sub.scale_y = 1.2
+        sub.operator("radialrenderer.add_camera_controller", text="Add camera controller")
 
         col.separator()
 
@@ -58,14 +60,14 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         # From <> To
         
         box = col.box()
-        grid = box.grid_flow(columns=3, align=True)
+
+        grid = box.grid_flow(columns=3)
         
         grid.label(text="From")
-        grid.prop(mytool, "from_obj", icon_value=prop.icons["none"].icon_id)
+        grid.prop(mytool, "from_obj")
         
         grid.separator()
-        row = grid.row()
-        row.operator(
+        grid.operator(
           "radialrenderer.swap_align",
           text="",
           icon='ARROW_LEFTRIGHT',
@@ -73,13 +75,12 @@ class RADIALRENDERER_PT_align(bpy.types.Panel, RADIALRENDERER_panel):
         )
         
         grid.label(text="To")
-        grid.prop(mytool, "to_obj", icon_value=prop.icons["none"].icon_id)
+        grid.prop(mytool, "to_obj")
         
         # Location and Rotation
         
         col.separator(factor=1)
         col.operator("radialrenderer.align_location", text="Align Location")
-        col.separator(factor=1)
         col.operator("radialrenderer.align_rotation", text="Align Rotation")
  
 
