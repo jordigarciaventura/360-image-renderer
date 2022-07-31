@@ -332,9 +332,6 @@ class MyProperties(bpy.types.PropertyGroup):
         else:
             return int(y)
 
-    def get_frames_count(self):
-        scene = bpy.context.scene
-        return 1 + scene.frame_end - scene.frame_start
       
     def get_frame_end(self):
       scene = bpy.context.scene
@@ -600,11 +597,6 @@ class MyProperties(bpy.types.PropertyGroup):
         description="Hide/Show non-selected renderable objects in viewport and in render",
         default=False,
         update=isolate.isolate_selection,
-    )
-
-    frames_count: IntProperty(
-        default=1,
-        get=get_frames_count,
     )
 
 

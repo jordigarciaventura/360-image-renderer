@@ -190,35 +190,38 @@ class RADIALRENDERER_PT_render(bpy.types.Panel, RADIALRENDERER_panel):
         scene = context.scene
         mytool = scene.my_tool
 
+        col = layout.column()
+
         # Path
-
-        layout.scale_y = 1
-
-        row = layout.row()
-        
-        row.prop(scene.render, "filepath", text="")
+        split = col.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="Output")
+        split.prop(scene.render, "filepath", text="")
 
         # Only selected
-
-        row = layout.row()
+        col.separator(factor=1)
+        row = col.row()
+        row.alignment = 'RIGHT'
         row.prop(mytool, "only_selected", text="Only selected")
 
-        layout.separator(factor=2)
+        col.separator(factor=2)
 
-        # Frames count
+        # Range
+        row = col.row(align=True)
+        row.prop(scene, "frame_start", text="Start")
+        row.prop(scene, "frame_end", text="End")
 
-        row = layout.row(align=True)
-        row.alignment = "RIGHT"
-        row.label(text="Frames count: " + str(mytool.frames_count))
+        col.separator()
 
-        # Export frames
-
-        row = layout.row()
+        # Render frames
+        row = col.row()
         row.scale_y = 1.5
+
+        frame_count = scene.frame_end - scene.frame_start
 
         row.operator(
             "radialrenderer.export",
-            text="Render frames",
+            text="Render {} frame{}".format(frame_count, "s" if frame_count != 1 else ""),
             icon_value=prop.icons["frames"].icon_id,
         )
 
