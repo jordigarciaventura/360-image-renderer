@@ -104,8 +104,17 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
     bl_idname = "radialrenderer.insert_keyframes"
 
     @classmethod
-    def poll(self, cls):
-      
+    def poll(self, context):
+        scene = context.scene
+        mytool = scene.my_tool
+         
+        if mytool.key_obj is None:
+            return False
+          
+        if mytool.key_obj not in set(bpy.context.scene.objects):
+          return False
+        
+        return True
 
     def execute(self, context):
 
@@ -115,16 +124,6 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         global obj
         global views
 
-        # Check dependencies
-        if mytool.key_obj is None:
-            self.report({"ERROR"}, prop.no_selected_error % "Key Object")
-            return {"FINISHED"}
-
-        if mytool.key_obj not in set(bpy.context.scene.objects):
-            self.report({"ERROR"}, prop.not_in_view_layer_error % "Key Object")
-            return {"FINISHED"}
-
-        # Validation
         name = mytool.marker_name
 
         if name:
