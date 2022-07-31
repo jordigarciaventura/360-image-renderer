@@ -81,13 +81,6 @@ def is_in_view_layer(self, object):
     return object in set(bpy.context.scene.objects)
 
 
-# CLASSES
-
-
-class Obj(bpy.types.PropertyGroup):
-    object: PointerProperty(type=bpy.types.Object)
-
-
 # PROPERTIES
 
 
@@ -602,15 +595,11 @@ class MyProperties(bpy.types.PropertyGroup):
 
     # Render
 
-    hidden_objects: CollectionProperty(type=Obj)
-
     only_selected: BoolProperty(
         name="",
         description="Hide/Show non-selected renderable objects in viewport and in render",
         default=False,
-        update=lambda self, context: isolate.isolate_selection_func(
-            self, context, "only_selected"
-        ),
+        update=isolate.isolate_selection,
     )
 
     frames_count: IntProperty(
@@ -620,7 +609,6 @@ class MyProperties(bpy.types.PropertyGroup):
 
 
 classes = (
-    Obj,
     MyProperties,
 )
 
