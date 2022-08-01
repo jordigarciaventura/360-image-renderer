@@ -4,12 +4,12 @@ import os
 import properties as prop
 
 
-def export_marker_names(self, context, path):
+def export_marker_names(self, context):
 
     scene = context.scene
+    path = scene.render.filepath
 
     # Check dependencies
-
     if not bpy.data.filepath:
         self.report({"ERROR"}, prop.project_not_saved_error)
         return {"FINISHED"}
@@ -92,7 +92,7 @@ class RADIALRENDERER_OT_export(bpy.types.Operator):
         scene = context.scene
         mytool = scene.my_tool
 
-        export_marker_names(self, context, mytool.path)
+        export_marker_names(self, context)
 
         return {"FINISHED"}
 
