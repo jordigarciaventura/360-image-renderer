@@ -127,7 +127,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
         # Clamp left steps with the rest
         self["left_steps"] = max(
-            0, min(self["left_steps"], x_steps_max - self["right_steps"])
+            0, min(self.left_steps, x_steps_max - self.right_steps)
         )
 
     def get_left_steps(self):
@@ -145,7 +145,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
         # Clamp right steps with the rest
         self["right_steps"] = max(
-            0, min(self["right_steps"], x_steps_max - self["left_steps"])
+            0, min(self.right_steps, x_steps_max - self.left_steps)
         )
 
     # Vertical Axis
