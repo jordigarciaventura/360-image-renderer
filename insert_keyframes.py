@@ -2,99 +2,84 @@ import bpy
 
 import properties as prop
 
-from math import (
-    radians,
-    degrees,
-)
 
-import re
+def rotate_and_add_markers(context, obj, x_angle, x_axis, x_min, x_max, y_angle, y_axis, y_min, y_max, format, x_show_sign, y_show_sign):    
+  """
+  Views: 0,0 is the initial view
+  
+         y_min        y_max
+         ----- -----  -----
+  x_min |-1,-1  0,-1   1,-1
+        |-1, 0  0, 0   1, 0
+  x_max |-1, 1  0, 1   1, 1
+  """
+  
+  scene = context.scene
+  
+  # Start at top left
+  x = x_min
+  y = y_min
+  rotation = obj.rotation_euler.copy()
+  rotate_axis(rotation, x_axis, x_angle * x_min)
+  rotate_axis(rotation, y_axis, y_angle * y_min)
+  obj.rotation_euler = rotation.copy()
+    
+  # Iterate through the matrix
+  while x <= x_max:
+    while y <= y_max:
+      # Insert keyframe
+      obj.keyframe_insert("rotation_euler", frame=scene.frame_current) 
+      # Insert marker
+      marker_name = format_marker_name(format, x, y, x_show_sign, y_show_sign) 
+      add_marker(context, marker_name)
+      scene.frame_current += 1
+      # Rotate object
+      rotate_axis(obj.rotation_euler, y_axis, y_angle)
+      y += 1
 
-initial_rotation = None
-values = []
+    # Set object rotation to the first column of the next row
+    rotate_axis(rotation, x_axis, x_angle)
+    obj.rotation_euler = rotation.copy()
+    y = y_min # Reset y 
+    x += 1
 
-# Rotate object
-def rotate_and_add_marker(
-    obj, x_axis, x_steps, x_angle, y_axis, y_steps, y_angle, marker_namerule
-):
 
-    scene = bpy.context.scene
-    mytool = scene.my_tool
+def rotate_axis(rotation_euler, axis, value):
+  if axis == 'X':
+    rotation_euler.x += value
+  elif axis == '-X':
+    rotation_euler.x -= value
+  elif axis == 'Y':
+    rotation_euler.y += value
+  elif axis == '-Y':
+    rotation_euler.y -= value
+  elif axis == 'Z':
+    rotation_euler.z += value
+  elif axis == '-Z':
+    rotation_euler.z -= value
+  
 
-    # Get orient axis
-    x_orient_axis = x_axis.replace("-", "")
-    y_orient_axis = y_axis.replace("-", "")
+def format_marker_name(format, x, y, x_show_sign, y_show_sign):
+  if x_show_sign and x > 0:
+    x = f"+{x}"
+  if y_show_sign and y > 0:
+    y = f"+{y}"
+  marker_name = format
+  marker_name = marker_name.replace("{H}", str(x))  
+  marker_name = marker_name.replace("{V}", str(y))
+  return marker_name
 
-    # Get dir
-    x_dir = int(re.sub("[XYZ]", "1", x_axis))
-    y_dir = int(re.sub("[XYZ]", "1", y_axis))
 
-    for y in range(0, abs(y_steps) + 1):
-        for x in range(0, abs(x_steps) + 1):
+def add_marker(context, name):
+    scene = context.scene
+    frame = scene.frame_current
+      
+    # One marker per frame, so remove if existing
+    for marker in scene.timeline_markers:
+        if marker.frame == frame:
+            scene.timeline_markers.remove(marker)
 
-            # Check to avoid repetitions
-            global values
-
-            # Get x and y signed (ID)
-            signed_x = -x if x_steps < 0 else x
-            signed_y = -y if y_steps < 0 else y
-
-            if (signed_x, signed_y) in values:
-                continue
-            else:
-                values.append((signed_x, signed_y))
-
-            # Calculate absolute angles
-
-            x_angle_abs = radians(degrees(x_angle * x))
-            y_angle_abs = radians(degrees(y_angle * y))
-
-            # Set rotation to initial
-            global initial_rotation
-            obj.rotation_euler = initial_rotation
-
-            # Rotate
-
-            # Right
-            if x_steps > 0:
-                obj.rotation_euler.rotate_axis(x_orient_axis, x_angle_abs * x_dir)
-            # Left
-            else:
-                obj.rotation_euler.rotate_axis(x_orient_axis, -x_angle_abs * x_dir)
-            # Up
-            if y_steps > 0:
-                obj.rotation_euler.rotate_axis(y_orient_axis, -y_angle_abs * y_dir)
-            # Down
-            else:
-                obj.rotation_euler.rotate_axis(y_orient_axis, y_angle_abs * y_dir)
-
-            # Set keyframe
-            obj.keyframe_insert("rotation_euler", frame=scene.frame_current)
-
-            # Add marker
-            if marker_namerule != "No marker name":
-
-                # Remove markers
-                for marker in scene.timeline_markers:
-                    if marker.frame == scene.frame_current:
-                        scene.timeline_markers.remove(marker)
-
-                x_value = str(signed_x)
-                y_value = str(signed_y)
-
-                if not mytool.x_mode == 'TURNAROUND' and signed_x > 0:
-                    x_value = "+" + x_value
-
-                if not mytool.y_mode == 'TURNAROUND' and signed_y > 0:
-                    y_value = "+" + y_value
-
-                marker_name = marker_namerule
-                marker_name = marker_name.replace("{H}", x_value)
-                marker_name = marker_name.replace("{V}", y_value)
-
-                scene.timeline_markers.new(marker_name, frame=scene.frame_current)
-
-            # Move next keyframe
-            scene.frame_current += 1
+    scene.timeline_markers.new(name, frame=frame)
 
 
 class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
@@ -112,237 +97,56 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
             return False
           
         if mytool.key_obj not in set(bpy.context.scene.objects):
-          return False
-        
+            return False
+                
         return True
+        
 
     def execute(self, context):
-
         scene = context.scene
         mytool = scene.my_tool
 
-        global obj
-        global views
+        if not prop.validate_file_name(mytool.marker_name):
+            self.report({"ERROR"}, prop.marker_name_error)
+            return {"FINISHED"}
 
-        name = mytool.marker_name
-
-        if name:
-            if not prop.validate_file_name(name):
-                self.report({"ERROR"}, prop.marker_name_error)
-                return {"FINISHED"}
-
-        obj = mytool.controller
+        # Necessary parameters
+        obj = mytool.key_obj
+        x_turnaround = mytool.x_mode == 'TURNAROUND'        
+        x_angle = mytool.x_clamped_angle if x_turnaround else mytool.x_angle 
+        x_axis = mytool.x_rotation_axis
+        x_min = 0 if x_turnaround else -mytool.left_steps
+        x_max = mytool.x_steps - 1 if x_turnaround else mytool.right_steps 
+        if not mytool.x_axis:
+          x_min = x_max = 0
+        y_turnaround = mytool.y_mode == 'TURNAROUND'
+        y_angle = mytool.y_clamped_angle if y_turnaround else mytool.y_angle 
+        y_axis = mytool.y_rotation_axis
+        y_min = 0 if y_turnaround else -mytool.down_steps
+        y_max = mytool.y_steps - 1 if y_turnaround else mytool.up_steps
+        if not mytool.y_axis:
+          y_min = y_max = 0
+        format = mytool.marker_name
+        x_show_sign = not x_turnaround
+        y_show_sign = not y_turnaround
 
         # Set start frame
         scene.frame_start = scene.frame_current
 
-        # Rotate objects
-        global initialized
-        initialized = False
-
-        global initial_rotation
-        initial_rotation = obj.rotation_euler.copy()
-
-        if mytool.x_axis and mytool.y_axis:
-
-            if mytool.x_mode == 'TURNAROUND' and mytool.y_mode == 'TURNAROUND':
-
-                # Use y_steps and x_steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.x_steps - 1,
-                    mytool.x_clamped_angle,
-                    mytool.y_rotation_axis,
-                    mytool.y_steps - 1,
-                    mytool.y_clamped_angle,
-                    mytool.marker_name,
-                )
-
-            elif mytool.x_mode == 'TURNAROUND':
-
-                # Use x_steps and up/down steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.x_steps - 1,
-                    mytool.x_clamped_angle,
-                    mytool.y_rotation_axis,
-                    mytool.up_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.x_steps - 1,
-                    mytool.x_clamped_angle,
-                    mytool.y_rotation_axis,
-                    -mytool.down_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-
-            elif mytool.y_mode == 'TURNAROUND':
-
-                # Use y_steps and right/left steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.right_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    mytool.y_steps - 1,
-                    mytool.y_clamped_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    -mytool.left_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    mytool.y_steps - 1,
-                    mytool.y_clamped_angle,
-                    mytool.marker_name,
-                )
-
-            else:
-
-                # Use right/left and up/down steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.right_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    mytool.up_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.right_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    -mytool.down_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    -mytool.left_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    mytool.up_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    -mytool.left_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    -mytool.down_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-
-        elif mytool.x_axis:
-
-            if mytool.x_mode == 'TURNAROUND':
-
-                # Use x_steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.x_steps - 1,
-                    mytool.x_clamped_angle,
-                    mytool.y_rotation_axis,
-                    0,
-                    0,
-                    mytool.marker_name,
-                )
-
-            else:
-
-                # Use right/left steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    mytool.right_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    0,
-                    0,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    -mytool.left_steps,
-                    mytool.x_angle,
-                    mytool.y_rotation_axis,
-                    0,
-                    0,
-                    mytool.marker_name,
-                )
-
-        elif mytool.y_axis:
-
-            if mytool.y_mode == 'TURNAROUND':
-
-                # Use y_steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    0,
-                    0,
-                    mytool.y_rotation_axis,
-                    mytool.y_steps - 1,
-                    mytool.y_clamped_angle,
-                    mytool.marker_name,
-                )
-
-            else:
-
-                # Use up/down steps
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    0,
-                    0,
-                    mytool.y_rotation_axis,
-                    mytool.up_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-                rotate_and_add_marker(
-                    obj,
-                    mytool.x_rotation_axis,
-                    0,
-                    0,
-                    mytool.y_rotation_axis,
-                    -mytool.down_steps,
-                    mytool.y_angle,
-                    mytool.marker_name,
-                )
-        else:
-
-            # Export one frame
-            rotate_and_add_marker(
-                obj,
-                mytool.x_rotation_axis,
-                0,
-                0,
-                mytool.y_rotation_axis,
-                0,
-                0,
-                mytool.marker_name,
-            )
+        # Rotate object
+        rotate_and_add_markers(context,
+                               obj,
+                               x_angle,
+                               x_axis,
+                               x_min,
+                               x_max,
+                               y_angle,
+                               y_axis,
+                               y_min,
+                               y_max,
+                               format,
+                               x_show_sign,
+                               y_show_sign)
 
         # Set end frame
         scene.frame_end = scene.frame_current - 1
