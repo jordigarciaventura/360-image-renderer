@@ -45,18 +45,10 @@ def rotate_and_add_markers(context, obj, x_angle, x_axis, x_min, x_max, y_angle,
 
 
 def rotate_axis(rotation_euler, axis, value):
-  if axis == 'X':
-    rotation_euler.x += value
-  elif axis == '-X':
-    rotation_euler.x -= value
-  elif axis == 'Y':
-    rotation_euler.y += value
-  elif axis == '-Y':
-    rotation_euler.y -= value
-  elif axis == 'Z':
-    rotation_euler.z += value
-  elif axis == '-Z':
-    rotation_euler.z -= value
+  if axis.startswith("-"):
+    rotation_euler.rotate_axis(axis[1:], value * -1)
+  else:
+    rotation_euler.rotate_axis(axis, value)
   
 
 def format_marker_name(format, x, y, x_show_sign, y_show_sign):
