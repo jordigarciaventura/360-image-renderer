@@ -95,6 +95,17 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
         split.label(text="Object")
         split.prop(mytool, "key_obj")
 
+        # Markers name
+        sub = col.column(align=True)
+        split = sub.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="Format")
+        split.prop(mytool, "marker_name")
+        split = sub.split(factor=0.2)
+        split.alignment = 'RIGHT'
+        split.label(text="")
+        split.prop(mytool, "marker_name_preview")
+
         col.separator()
         
         col.label(text="Keyframes")
@@ -145,20 +156,6 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel, RADIALRENDERER_panel
               subcol.prop(mytool, "y_angle", text="Angle")
               subcol.prop(mytool, "up_steps", text="Up Steps")
               subcol.prop(mytool, "down_steps", text="Down Steps")        
-        
-        # Markers name
-        col.separator()
-
-        sub = col.column(align=True)
-        sub.label(text="Marker names")
-        split = sub.split(factor=0.2)
-        split.alignment = 'RIGHT'
-        split.label(text="Format")
-        split.prop(mytool, "marker_name")
-        split = sub.split(factor=0.2)
-        split.alignment = 'RIGHT'
-        split.label(text="")
-        split.prop(mytool, "marker_name_preview")
 
         col.separator(factor=2)
 
