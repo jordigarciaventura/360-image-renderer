@@ -7,19 +7,19 @@ from mathutils import Vector
 
 
 # Creates a Light Controller
-def add_light_controller(context, parent):
+def create_light_controller(parent):
     parent_rotation = Vector(
         (parent.rotation_euler.x, parent.rotation_euler.y, parent.rotation_euler.z))
 
-    # Create light controller
-    light_controller = bpy.data.objects.new("Light Controller", None)
-    light_controller.empty_display_type = 'SPHERE'
-    light_controller.location = parent.location
-    light_controller.rotation_euler = parent_rotation
-    light_controller.scale = parent.scale * 0.8
+    # Create light pivot
+    light_pivot = bpy.data.objects.new("Light Pivot", None)
+    light_pivot.empty_display_type = 'SPHERE'
+    light_pivot.location = parent.location
+    light_pivot.rotation_euler = parent_rotation
+    light_pivot.scale = parent.scale * 0.8
 
     # Add 'Child of' constraint
-    light_child_of = light_controller.constraints.new('CHILD_OF')
+    light_child_of = light_pivot.constraints.new('CHILD_OF')
     light_child_of.target = parent
     light_child_of.use_scale_x = False
     light_child_of.use_scale_y = False
@@ -30,11 +30,11 @@ def add_light_controller(context, parent):
     light = bpy.data.objects.new("Light", light_data)
     light.location = parent.location
     light.rotation_euler = parent_rotation + Vector((radians(90), 0, 0))
-    light.scale = light_controller.scale * 4
+    light.scale = light_pivot.scale * 4
 
     # Add 'Transform' constraint
     light_transform = light.constraints.new('TRANSFORM')
-    light_transform.target = light_controller
+    light_transform.target = light_pivot
     light_transform.target_space = 'LOCAL'
     light_transform.owner_space = 'LOCAL'
     light_transform.map_from = 'SCALE'
@@ -46,7 +46,7 @@ def add_light_controller(context, parent):
 
     # Add 'Child of' constraint
     light_child_of = light.constraints.new('CHILD_OF')
-    light_child_of.target = light_controller
+    light_child_of.target = light_pivot
     light_child_of.use_scale_x = False
     light_child_of.use_scale_y = False
     light_child_of.use_scale_z = False
@@ -59,18 +59,12 @@ def add_light_controller(context, parent):
     light.lock_rotation[1] = True
     light.lock_rotation[2] = True
 
-    # Add objects to scene
-    context.collection.objects.link(light_controller)
-    context.collection.objects.link(light)
+    # Add to collection
+    collection = bpy.data.collections.new("Light Controller")
+    collection.objects.link(light_pivot)
+    collection.objects.link(light)
 
-    # Select controller
-    for obj in context.selected_objects:
-        obj.select_set(False)
-
-    context.view_layer.objects.active = light_controller
-    light_controller.select_set(True)
-
-    return light_controller
+    return collection, light, light_pivot
 
 
 class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
@@ -93,7 +87,15 @@ class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
             self.report({"ERROR"}, prop.not_in_view_layer_error % "Controller")
             return {"FINISHED"}
 
-        add_light_controller(context, mytool.controller)
+        # Add light controller
+        coll, _, light_pivot = create_light_controller(mytool.controller) # Create light controller
+        mytool.controller.users_collection[0].children.link(coll) # Add inside camera controller 
+
+        # Select controller
+        for obj in context.selected_objects:
+            obj.select_set(False)
+        context.view_layer.objects.active = light_pivot
+        light_pivot.select_set(True)
 
         return {"FINISHED"}
 

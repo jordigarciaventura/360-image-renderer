@@ -1,46 +1,26 @@
 import bpy
 
-from math import (
-    radians,
-    degrees,
-)
+from math import radians
 
 from mathutils import Vector
 
-from add_light_controller import add_light_controller
-
 # Creates a Camera Controller and 3 Light Controllers. Returns the object
-def add_camera_controller(context, location, radius):
-    scene = context.scene
-
-    # Create collection
-    coll_name = "360 Viewer"
-    coll = bpy.data.collections.new(coll_name)
-    scene.collection.children.link(coll)
-
-    # Select collection
-    layer_coll = bpy.context.view_layer.layer_collection.children[coll.name]
-    context.view_layer.active_layer_collection = layer_coll
-
-    # CAMERA CONTROLLER
-
-    # Create controller
-    cam_controller = bpy.data.objects.new("Camera Controller", None)
-    cam_controller.empty_display_type = "SPHERE"
-    cam_controller.location = location
-    cam_controller.scale = Vector((radius, radius, radius))
-    coll.objects.link(cam_controller)
+def create_camera_controller(location, radius):
+    # Create camera pivot
+    camera_pivot = bpy.data.objects.new("Camera Pivot", None)
+    camera_pivot.empty_display_type = "SPHERE"
+    camera_pivot.location = location
+    camera_pivot.scale = Vector((radius, radius, radius))
 
     # Create camera
-    cam_data = bpy.data.cameras.new(name="Camera")
-    cam = bpy.data.objects.new("Camera", cam_data)
-    cam.location = location
-    cam.rotation_euler = (radians(90), 0, 0)
-    coll.objects.link(cam)
+    camera_data = bpy.data.cameras.new(name="Camera")
+    camera = bpy.data.objects.new("Camera", camera_data)
+    camera.location = location
+    camera.rotation_euler = (radians(90), 0, 0)
 
     # Add 'Transform' constraint
-    light_transform = cam.constraints.new('TRANSFORM')
-    light_transform.target = cam_controller
+    light_transform = camera.constraints.new('TRANSFORM')
+    light_transform.target = camera_pivot
     light_transform.target_space = 'LOCAL'
     light_transform.owner_space = 'LOCAL'
     light_transform.map_from = 'SCALE'
@@ -51,32 +31,30 @@ def add_camera_controller(context, location, radius):
     light_transform.to_max_z = 100000
 
     # Add 'Child of' constraint
-    cam_child_of = cam.constraints.new('CHILD_OF')
-    cam_child_of.target = cam_controller
+    cam_child_of = camera.constraints.new('CHILD_OF')
+    cam_child_of.target = camera_pivot
     cam_child_of.use_scale_x = False
     cam_child_of.use_scale_y = False
     cam_child_of.use_scale_z = False
 
     # Lock camera transform
-    cam.lock_location[0] = True
-    cam.lock_location[1] = True
-    cam.lock_location[2] = True
-    cam.lock_rotation[0] = True
-    cam.lock_rotation[1] = True
-    cam.lock_rotation[2] = True
-    cam.lock_scale[0] = True
-    cam.lock_scale[1] = True
-    cam.lock_scale[2] = True
+    camera.lock_location[0] = True
+    camera.lock_location[1] = True
+    camera.lock_location[2] = True
+    camera.lock_rotation[0] = True
+    camera.lock_rotation[1] = True
+    camera.lock_rotation[2] = True
+    camera.lock_scale[0] = True
+    camera.lock_scale[1] = True
+    camera.lock_scale[2] = True
     
-    # Select controller
-    for obj in context.selected_objects:
-        obj.select_set(False)
-
-    context.view_layer.objects.active = cam_controller
-    cam_controller.select_set(True)
+    # Add to collection
+    collection = bpy.data.collections.new("Camera Controller")
+    collection.objects.link(camera)
+    collection.objects.link(camera_pivot)
 
     # Return controller
-    return cam_controller
+    return collection, camera, camera_pivot
 
 
 class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
@@ -105,11 +83,22 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
         radius = 1
         if selected_objects:
           if len(selected_objects) == 1:
-            radius = max(selected_objects[0].dimensions)
+            if hasattr(selected_objects[0], "dimensions"):
+              radius = max(1, max(selected_objects[0].dimensions))
           else:
             radius = 2 * max([(obj.location - spawn_location).magnitude for obj in selected_objects])
 
-        mytool.controller = mytool.from_obj = mytool.key_obj = add_camera_controller(context, spawn_location, radius)
+        # Add camera controller
+        coll, _, camera_pivot = create_camera_controller(spawn_location, radius) # Create
+        scene.collection.children.link(coll) # Add to scene
+        
+        # Select controller
+        for obj in context.selected_objects:
+            obj.select_set(False)
+        context.view_layer.objects.active = camera_pivot
+        camera_pivot.select_set(True)
+
+        mytool.controller = mytool.from_obj = mytool.key_obj = camera_pivot # Prefill user inputs
 
         return {"FINISHED"}
 
