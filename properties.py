@@ -1,6 +1,7 @@
 import bpy
 
-import isolate_selection as isolate
+from isolate_selection import isolate_selection
+from setup_transparent_background import setup_transparent_background
 
 from bpy.props import (
     StringProperty,
@@ -523,7 +524,14 @@ class MyProperties(bpy.types.PropertyGroup):
         name="",
         description="Hide/Show non-selected renderable objects in viewport and in render",
         default=False,
-        update=isolate.isolate_selection,
+        update=lambda self, context: isolate_selection(context, self.only_selected),
+    )
+    
+    transparent_background: BoolProperty(
+        name="",
+        description="Change/Restore render and output properties for transparent background",
+        default=False,
+        update=lambda self, context: setup_transparent_background(context, self.transparent_background),
     )
 
 

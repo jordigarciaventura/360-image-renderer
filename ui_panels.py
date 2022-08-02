@@ -193,20 +193,23 @@ class RADIALRENDERER_PT_render(bpy.types.Panel, RADIALRENDERER_panel):
 
         # Path
         split = col.split(factor=0.2)
-        split.alignment = 'RIGHT'
+        split.alignment= 'RIGHT'
         split.label(text="Output")
         split.prop(scene.render, "filepath", text="")
 
         # Only selected
         col.separator(factor=1)
-        row = col.row()
-        row.alignment = 'RIGHT'
-        row.prop(mytool, "only_selected", text="Only selected")
-
+        split = col.split(factor=0.2)
+        split.label(text="")
+        split.prop(mytool, "only_selected", text="Only selected")
+        split = col.split(factor=0.2)
+        split.label(text="")
+        split.prop(mytool, "transparent_background", text="Transparent background")
         col.separator(factor=2)
 
         # Range
         row = col.row(align=True)
+        row.use_property_split = False
         row.prop(scene, "frame_start", text="Start")
         row.prop(scene, "frame_end", text="End")
 
