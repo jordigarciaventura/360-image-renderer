@@ -35,8 +35,8 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel, RADIALRENDERER_panel):
         split = box.split(align=True, factor=0.4)
         split.alignment = "RIGHT"
 
-        split.label(text="Camera controller")
-        split.prop(mytool, "controller", icon='OUTLINER_DATA_CAMERA')
+        split.label(text="Camera pivot")
+        split.prop(mytool, "controller", icon='CON_CAMERASOLVER')
         
         # Add light controller                
         box.operator("radialrenderer.add_light_controller", text="Add light controller")
