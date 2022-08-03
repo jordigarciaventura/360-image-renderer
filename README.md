@@ -1,17 +1,17 @@
 # 360 renderer
-## DESCRIPTION
-Blender add-on for render your models up to 360º as image sequence. 
+Blender add-on for render your models up to 360º as image sequence.
 
 ## COMPATIBILITY
 Tested versions:
 - Blender 2.81
 - Blender 2.83
 - Blender 2.92
+- Blender 3.2.1
 
 ## INSTALLATION
 In GitHub:
 
-1. Download the add-on as ZIP
+1. Download the [latest release](https://github.com/jordigarciaventura/360-renderer/releases/latest) ZIP.
 
 In Blender:
 
