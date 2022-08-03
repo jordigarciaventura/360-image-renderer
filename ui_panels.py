@@ -97,21 +97,20 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel,
         split.alignment = 'RIGHT'
         split.label(text="Object")
         split.prop(mytool, "key_obj")
+        col.separator()
 
         # Markers name
-        sub = col.column(align=True)
-        split = sub.split(factor=0.2)
-        split.alignment = 'RIGHT'
-        split.label(text="Format")
-        split.prop(mytool, "marker_name")
-        split = sub.split(factor=0.2)
-        split.alignment = 'RIGHT'
-        split.label(text="")
-        split.prop(mytool, "marker_name_preview")
+        box = col.box()
+        row = box.row(align=True)
+        row.prop(mytool, "add_markers", text="")
+        row.label(text="Marker name")
+        sub = box.column(align=True)
+        sub.enabled = mytool.add_markers
+        sub.prop(mytool, "marker_name")
+        sub.prop(mytool, "marker_name_preview")
 
         col.separator()
 
-        col.label(text="Keyframes")
         # Horizontal Axis
         box = col.box()
 

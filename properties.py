@@ -491,6 +491,11 @@ class MyProperties(bpy.types.PropertyGroup):
         get=get_views_count,
     )
 
+    add_markers: BoolProperty(
+        name= "Add markers",
+        default= True
+    )
+
     marker_name: StringProperty(
         name="",
         description="Marker names (use {H} and {V} for horizontal and vertical values)",

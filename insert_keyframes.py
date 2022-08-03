@@ -6,7 +6,7 @@ import properties as prop
 def rotate_and_add_markers(context, obj,
                            x_angle, x_axis, x_min, x_max,
                            y_angle, y_axis, y_min, y_max,
-                           format, x_show_sign, y_show_sign):
+                           add_markers, format, x_show_sign, y_show_sign):
     """
     Views: 0,0 is the initial view
 
@@ -33,11 +33,12 @@ def rotate_and_add_markers(context, obj,
             # Insert keyframe
             obj.keyframe_insert("rotation_euler", frame=scene.frame_current)
             # Insert marker
-            marker_name = format_marker_name(
-                format, x, y, x_show_sign, y_show_sign)
-            add_marker(context, marker_name)
-            scene.frame_current += 1
+            if add_markers:
+                marker_name = format_marker_name(
+                    format, x, y, x_show_sign, y_show_sign)
+                add_marker(context, marker_name)
             # Rotate object
+            scene.frame_current += 1
             rotate_axis(obj.rotation_euler, y_axis, y_angle)
             y += 1
 
@@ -122,6 +123,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         y_max = mytool.y_steps - 1 if y_turnaround else mytool.up_steps
         if not mytool.y_axis:
             y_min = y_max = 0
+        add_markers = mytool.add_markers
         format = mytool.marker_name
         x_show_sign = not x_turnaround
         y_show_sign = not y_turnaround
@@ -133,7 +135,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         rotate_and_add_markers(context, obj,
                                x_angle, x_axis, x_min, x_max,
                                y_angle, y_axis, y_min, y_max,
-                               format, x_show_sign, y_show_sign)
+                               add_markers, format, x_show_sign, y_show_sign)
 
         # Set end frame
         scene.frame_end = scene.frame_current - 1
