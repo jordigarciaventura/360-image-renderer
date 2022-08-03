@@ -4,7 +4,7 @@ import properties as prop
 
 
 def align_rotation(obj_from, obj_to):
-    obj_from.rotation_euler = obj_to.rotation_euler
+    obj_from.rotation_euler = obj_to.matrix_world.to_euler()
 
 
 class RADIALRENDERER_OT_align_rotation(bpy.types.Operator):
