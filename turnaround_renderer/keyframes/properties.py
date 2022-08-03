@@ -1,52 +1,9 @@
-import re
+import bpy
+
 from math import degrees, radians
 
-import bpy
-from bpy.props import (BoolProperty,
-                       EnumProperty,
-                       FloatProperty,
-                       IntProperty,
-                       PointerProperty,
-                       StringProperty)
 
-from isolate_selection import isolate_selection
-from setup_transparent_background import setup_transparent_background
-
-# VARIABLES
-invalid_chars = r"[\\\/\:\*\?\"\<\>\|]"
-
-# Errors
-marker_name_error = (
-    """A marker name can't contain any of these characters:
-    \\ / : * ? " < > |"""
-)
-not_in_view_layer_error = "The %s is not in the View Layer"
-no_selected_error = "No %s selected"
-project_not_saved_error = "The project is not saved"
-path_empty_error = "Select a path to save the frames"
-no_active_camera_error = "There is no active camera"
-markers_names_named_error = (
-    "Not all frames within the render range \
-    have a named marker"
-)
-
-# Messages
-render_started_msg = "360 RENDERER: render started\n"
-render_finished_msg = "360 RENDERER: render finished\n"
-frames_renderer_msg = "360 RENDERER: %s/%s frames rendered\n"
-
-
-# FUNCTIONS
-def validate_file_name(name):
-    return not re.search(invalid_chars, name)
-
-
-def is_in_view_layer(self, object):
-    return object in set(bpy.context.scene.objects)
-
-
-# PROPERTIES
-class MyProperties(bpy.types.PropertyGroup):
+class Properties(bpy.types.PropertyGroup):
 
     # GETTER/SETTER
     # Horizontal Axis
@@ -243,6 +200,7 @@ class MyProperties(bpy.types.PropertyGroup):
         )
 
     # Create keyframes
+
     def get_marker_name(self):
         return self.get("marker_name", "V{V}H{H}")
 
@@ -276,46 +234,20 @@ class MyProperties(bpy.types.PropertyGroup):
         scene = bpy.context.scene
         return scene.frame_current + self.views_count - 1
 
-    # PROPERTY DEFINITIONS
-
-    # Setup
-    controller: PointerProperty(
-        type=bpy.types.Object,
-        name="",
-        description="Controller to rotate",
-        poll=is_in_view_layer,
-    )
-
-    # Align
-    from_obj: PointerProperty(
-        type=bpy.types.Object,
-        name="",
-        description="Object to align from",
-        poll=is_in_view_layer,
-    )
-
-    to_obj: PointerProperty(
-        type=bpy.types.Object,
-        name="",
-        description="Object to align to",
-        poll=is_in_view_layer,
-    )
-
     # Keyframe Assistant
-    key_obj: PointerProperty(
+    key_obj: bpy.props.PointerProperty(
         type=bpy.types.Object,
         name="",
         description="Object to insert rotation keyframes",
-        poll=is_in_view_layer,
     )
 
     # X Turnaround
-    x_axis: BoolProperty(
+    x_axis: bpy.props.BoolProperty(
         name="",
         default=False,
     )
 
-    x_rotation_axis: EnumProperty(
+    x_rotation_axis: bpy.props.EnumProperty(
         items=[
             ("X", "X", ""),
             ("Y", "Y", ""),
@@ -329,7 +261,7 @@ class MyProperties(bpy.types.PropertyGroup):
         default="Z",
     )
 
-    x_mode: EnumProperty(
+    x_mode: bpy.props.EnumProperty(
         name="Rotation mode",
         items={
             ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
@@ -339,7 +271,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_x_mode
     )
 
-    x_steps: IntProperty(
+    x_steps: bpy.props.IntProperty(
         name="",
         min=1,
         max=360,
@@ -348,15 +280,15 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_x_steps,
     )
 
-    x_steps_max: IntProperty()
+    x_steps_max: bpy.props.IntProperty()
 
     # Y Turnaround
-    y_axis: BoolProperty(
+    y_axis: bpy.props.BoolProperty(
         name="",
         default=False,
     )
 
-    y_rotation_axis: EnumProperty(
+    y_rotation_axis: bpy.props.EnumProperty(
         items=[
             ("X", "X", ""),
             ("Y", "Y", ""),
@@ -370,7 +302,7 @@ class MyProperties(bpy.types.PropertyGroup):
         default="X",
     )
 
-    y_mode: EnumProperty(
+    y_mode: bpy.props.EnumProperty(
         name="Rotation mode",
         items={
             ('TURNAROUND', "Turnaround", "Turnaround mode", 0),
@@ -380,7 +312,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_y_mode
     )
 
-    y_steps: IntProperty(
+    y_steps: bpy.props.IntProperty(
         name="",
         default=1,
         min=1,
@@ -389,10 +321,10 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_y_steps,
     )
 
-    y_steps_max: IntProperty()
+    y_steps_max: bpy.props.IntProperty()
 
     # X Custom
-    x_angle: FloatProperty(
+    x_angle: bpy.props.FloatProperty(
         name="",
         description="Angle of each step in Z",
         default=radians(1),
@@ -405,7 +337,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_x_angle,
     )
 
-    x_clamped_angle: FloatProperty(
+    x_clamped_angle: bpy.props.FloatProperty(
         name="",
         description="Angle of each part in Z",
         default=radians(1),
@@ -418,7 +350,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_x_clamped_angle,
     )
 
-    right_steps: IntProperty(
+    right_steps: bpy.props.IntProperty(
         name="",
         description="Steps to rotate in +Z",
         default=0,
@@ -428,7 +360,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_right_steps,
     )
 
-    left_steps: IntProperty(
+    left_steps: bpy.props.IntProperty(
         name="",
         description="Steps to rotate in -Z",
         default=0,
@@ -439,7 +371,7 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Y Custom
-    y_angle: FloatProperty(
+    y_angle: bpy.props.FloatProperty(
         name="",
         description="Angle of each step in X",
         default=radians(1),
@@ -452,7 +384,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_y_angle,
     )
 
-    y_clamped_angle: FloatProperty(
+    y_clamped_angle: bpy.props.FloatProperty(
         name="",
         description="Angle of each part in X",
         default=radians(1),
@@ -465,7 +397,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_y_clamped_angle,
     )
 
-    up_steps: IntProperty(
+    up_steps: bpy.props.IntProperty(
         name="",
         description="Steps to rotate in +X",
         default=0,
@@ -475,7 +407,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_up_steps,
     )
 
-    down_steps: IntProperty(
+    down_steps: bpy.props.IntProperty(
         name="",
         description="Steps to rotate in -X",
         default=0,
@@ -486,17 +418,17 @@ class MyProperties(bpy.types.PropertyGroup):
     )
 
     # Insert keyframes
-    views_count: IntProperty(
+    views_count: bpy.props.IntProperty(
         default=1,
         get=get_views_count,
     )
 
-    add_markers: BoolProperty(
-        name= "Add markers",
-        default= True
+    add_markers: bpy.props.BoolProperty(
+        name="Add markers",
+        default=True
     )
 
-    marker_name: StringProperty(
+    marker_name: bpy.props.StringProperty(
         name="",
         description="Marker names (use {H} and {V} for horizontal and vertical values)",
         default="H{H}V{V}",
@@ -506,7 +438,7 @@ class MyProperties(bpy.types.PropertyGroup):
         set=set_marker_name,
     )
 
-    marker_name_preview: StringProperty(
+    marker_name_preview: bpy.props.StringProperty(
         name="",
         description="Example marker name",
         default="V1H0",
@@ -515,40 +447,18 @@ class MyProperties(bpy.types.PropertyGroup):
         get=get_marker_name_preview,
     )
 
-    frame_end: IntProperty(
+    frame_end: bpy.props.IntProperty(
         name="",
         description="End frame from last keyframe",
         get=get_frame_end,
     )
 
-    # Render
-    only_selected: BoolProperty(
-        name="",
-        description="Hide/Show non-selected renderable objects in viewport and in render",
-        default=False,
-        update=lambda self, context: isolate_selection(
-            context, self.only_selected),
-    )
-
-    transparent_background: BoolProperty(
-        name="",
-        description="Change/Restore render and output properties for transparent background",
-        default=False,
-        update=lambda self, context: setup_transparent_background(
-            context, self.transparent_background),
-    )
-
-
-classes = (
-    MyProperties,
-)
-
 
 def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    bpy.utils.register_class(Properties)
+    bpy.types.Scene.keyframes_properties = bpy.props.PointerProperty(type=Properties)
 
 
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.keyframes_properties
+    bpy.utils.unregister_class(Properties)

@@ -13,7 +13,7 @@ init_file_name : str
 import os
 import sys
 
-project_dir = r"C:\Users\jordi\Documents\GitHub\360-renderer"
+project_dir = r"C:\Users\jordi\Documents\GitHub\360-renderer\turnaround_renderer"
 init_file_name = "__init__.py"
 
 if project_dir not in sys.path:

@@ -1,10 +1,65 @@
 import bpy
 
 from math import radians
-
 from mathutils import Vector
 
-# Creates a Camera Controller and 3 Light Controllers. Returns the object
+
+def create_light_controller(parent):
+    # Create light pivot
+    light_pivot = bpy.data.objects.new("Light Pivot", None)
+    light_pivot.empty_display_type = 'SPHERE'
+    light_pivot.location = parent.location
+    light_pivot.rotation_euler = parent.rotation_euler.copy()
+    light_pivot.scale = parent.scale * 0.8
+
+    # Add 'Child of' constraint
+    light_child_of = light_pivot.constraints.new('CHILD_OF')
+    light_child_of.target = parent
+    light_child_of.use_scale_x = False
+    light_child_of.use_scale_y = False
+    light_child_of.use_scale_z = False
+
+    # Create light
+    light_data = bpy.data.lights.new("Light", type="AREA")
+    light = bpy.data.objects.new("Light", light_data)
+    light.location = parent.location
+    light.rotation_euler = parent.rotation_euler.copy()
+    light.rotation_euler.rotate_axis('X', radians(90))
+    light.scale = light_pivot.scale * 4
+
+    # Add 'Transform' constraint
+    light_transform = light.constraints.new('TRANSFORM')
+    light_transform.target = light_pivot
+    light_transform.target_space = 'LOCAL'
+    light_transform.owner_space = 'LOCAL'
+    light_transform.map_from = 'SCALE'
+    light_transform.from_min_y_scale = 0
+    light_transform.from_max_y_scale = 100000
+    light_transform.map_to = 'LOCATION'
+    light_transform.map_to_z_from = 'Y'
+    light_transform.to_max_z = 100000
+
+    # Add 'Child of' constraint
+    light_child_of = light.constraints.new('CHILD_OF')
+    light_child_of.target = light_pivot
+    light_child_of.use_scale_x = False
+    light_child_of.use_scale_y = False
+    light_child_of.use_scale_z = False
+
+    # Lock transforms
+    light.lock_location[0] = True
+    light.lock_location[1] = True
+    light.lock_location[2] = True
+    light.lock_rotation[0] = True
+    light.lock_rotation[1] = True
+    light.lock_rotation[2] = True
+
+    # Add to collection
+    collection = bpy.data.collections.new("Light Controller")
+    collection.objects.link(light_pivot)
+    collection.objects.link(light)
+
+    return collection, light, light_pivot
 
 
 def create_camera_controller(location, radius):
@@ -89,50 +144,3 @@ def get_selection_diameter(context, center):
     distances = [(obj.location - center).magnitude for obj in selected_objects]
     max_distance = max(distances)
     return max_distance * 2
-
-
-class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
-    """Add a pre-built camera controller"""
-
-    bl_label = "Create Camera Controller"
-    bl_idname = "radialrenderer.add_camera_controller"
-
-    def execute(self, context):
-        scene = context.scene
-        mytool = scene.my_tool
-
-        # Calculate spawn location
-        spawn_location = get_selection_center(context)
-        # Calculate diamater
-        radius = get_selection_diameter(context, spawn_location)
-
-        # Add camera controller
-        coll, _, camera_pivot = create_camera_controller(
-            spawn_location, radius)
-        scene.collection.children.link(coll)  # Add to scene
-
-        # Select controller
-        for obj in context.selected_objects:
-            obj.select_set(False)
-        context.view_layer.objects.active = camera_pivot
-        camera_pivot.select_set(True)
-
-        # Prefill user inputs
-        mytool.controller = camera_pivot
-        mytool.from_obj = camera_pivot
-        mytool.key_obj = camera_pivot
-
-        return {"FINISHED"}
-
-
-classes = (RADIALRENDERER_OT_add_camera_controller,)
-
-
-def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
