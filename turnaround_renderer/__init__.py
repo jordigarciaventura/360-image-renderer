@@ -1,4 +1,3 @@
-import bpy
 import importlib
 import sys
 
@@ -34,7 +33,7 @@ ordered_module_names = [
 ]
 
 if __name__ != "__main__":
-    ordered_module_names = [f"{__name__}.{name}" for name in ordered_module_names]
+    ordered_module_names = [f"{__name__}.{x}" for x in ordered_module_names]
 
 # IMPORT
 for module_name in ordered_module_names:
