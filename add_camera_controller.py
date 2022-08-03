@@ -5,6 +5,8 @@ from math import radians
 from mathutils import Vector
 
 # Creates a Camera Controller and 3 Light Controllers. Returns the object
+
+
 def create_camera_controller(location, radius):
     # Create camera pivot
     camera_pivot = bpy.data.objects.new("Camera Pivot", None)
@@ -47,7 +49,7 @@ def create_camera_controller(location, radius):
     camera.lock_scale[0] = True
     camera.lock_scale[1] = True
     camera.lock_scale[2] = True
-    
+
     # Add to collection
     collection = bpy.data.collections.new("Camera Controller")
     collection.objects.link(camera)
@@ -55,6 +57,38 @@ def create_camera_controller(location, radius):
 
     # Return controller
     return collection, camera, camera_pivot
+
+
+def vector_mean(vectors):
+    total = Vector()
+    for vector in vectors:
+        total += vector
+    return total / len(vectors)
+
+
+def get_selection_center(context):
+    selected_objects = context.selected_objects
+    if selected_objects:
+        return vector_mean([obj.location for obj in selected_objects])
+    else:
+        return context.scene.cursor.location.copy()
+
+
+def get_selection_diameter(context, center):
+    selected_objects = context.selected_objects
+
+    if not selected_objects:
+        return 1
+
+    if len(selected_objects) == 1:
+        if hasattr(selected_objects[0], "dimensions"):
+            max_dimension = max(selected_objects[0].dimensions)
+            return max(1, max_dimension)
+        return 1
+
+    distances = [(obj.location - center).magnitude for obj in selected_objects]
+    max_distance = max(distances)
+    return max_distance * 2
 
 
 class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
@@ -67,48 +101,38 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
         scene = context.scene
         mytool = scene.my_tool
 
-        selected_objects = context.selected_objects
-
-        # Calculate spawn location        
-        spawn_location = Vector()
-        if selected_objects:
-            # Center point of all selected objects
-            for obj in selected_objects:
-                spawn_location += obj.location
-            spawn_location /= len(selected_objects)
-        else:
-            spawn_location = context.scene.cursor.location.copy()
-
-        # Calculate radius
-        radius = 1
-        if selected_objects:
-          if len(selected_objects) == 1:
-            if hasattr(selected_objects[0], "dimensions"):
-              radius = max(1, max(selected_objects[0].dimensions))
-          else:
-            radius = 2 * max([(obj.location - spawn_location).magnitude for obj in selected_objects])
+        # Calculate spawn location
+        spawn_location = get_selection_center(context)
+        # Calculate diamater
+        radius = get_selection_diameter(context, spawn_location)
 
         # Add camera controller
-        coll, _, camera_pivot = create_camera_controller(spawn_location, radius) # Create
-        scene.collection.children.link(coll) # Add to scene
-        
+        coll, _, camera_pivot = create_camera_controller(
+            spawn_location, radius)
+        scene.collection.children.link(coll)  # Add to scene
+
         # Select controller
         for obj in context.selected_objects:
             obj.select_set(False)
         context.view_layer.objects.active = camera_pivot
         camera_pivot.select_set(True)
 
-        mytool.controller = mytool.from_obj = mytool.key_obj = camera_pivot # Prefill user inputs
+        # Prefill user inputs
+        mytool.controller = camera_pivot
+        mytool.from_obj = camera_pivot
+        mytool.key_obj = camera_pivot
 
         return {"FINISHED"}
 
 
 classes = (RADIALRENDERER_OT_add_camera_controller,)
 
+
 def register():
-  for cls in classes:
-    bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
 
 def unregister():
-  for cls in classes:
-    bpy.utils.unregister_class(cls)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

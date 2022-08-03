@@ -1,37 +1,34 @@
+import re
+from math import degrees, radians
+
 import bpy
+from bpy.props import (BoolProperty,
+                       EnumProperty,
+                       FloatProperty,
+                       IntProperty,
+                       PointerProperty,
+                       StringProperty)
 
 from isolate_selection import isolate_selection
 from setup_transparent_background import setup_transparent_background
 
-from bpy.props import (
-    StringProperty,
-    BoolProperty,
-    IntProperty,
-    FloatProperty,
-    PointerProperty,
-    EnumProperty,
-)
-
-from math import (
-    radians,
-    degrees,
-)
-
-import re
-
 # VARIABLES
-invalid_chars = '[\\\/\:\*\?\"\<\>\|]'
+invalid_chars = r"[\\\/\:\*\?\"\<\>\|]"
 
 # Errors
 marker_name_error = (
-    "A marker name can't contain any of these characters: \n" + '\\ / : * ? " < > |'
+    """A marker name can't contain any of these characters:
+    \\ / : * ? " < > |"""
 )
 not_in_view_layer_error = "The %s is not in the View Layer"
 no_selected_error = "No %s selected"
 project_not_saved_error = "The project is not saved"
 path_empty_error = "Select a path to save the frames"
 no_active_camera_error = "There is no active camera"
-markers_names_named_error = "Not all frames within the render range have a named marker"
+markers_names_named_error = (
+    "Not all frames within the render range \
+    have a named marker"
+)
 
 # Messages
 render_started_msg = "360 RENDERER: render started\n"
@@ -94,7 +91,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
         if x_steps_total > self["x_steps_max"]:
 
-            # Distribute the max steps proportionally (losing the decimals == 1 unit)
+            # Distribute the max steps proportionally
             factor = self["x_steps_max"] / x_steps_total
 
             left_steps_new = int(self["left_steps"] * factor)
@@ -190,7 +187,7 @@ class MyProperties(bpy.types.PropertyGroup):
 
         if y_steps_total > self["y_steps_max"]:
 
-            # Distribute the max steps proportionally (losing the decimals == 1 unit)
+            # Distribute the max steps proportionally
             factor = self["y_steps_max"] / y_steps_total
 
             down_steps_new = int(self["down_steps"] * factor)
@@ -524,14 +521,16 @@ class MyProperties(bpy.types.PropertyGroup):
         name="",
         description="Hide/Show non-selected renderable objects in viewport and in render",
         default=False,
-        update=lambda self, context: isolate_selection(context, self.only_selected),
+        update=lambda self, context: isolate_selection(
+            context, self.only_selected),
     )
-    
+
     transparent_background: BoolProperty(
         name="",
         description="Change/Restore render and output properties for transparent background",
         default=False,
-        update=lambda self, context: setup_transparent_background(context, self.transparent_background),
+        update=lambda self, context: setup_transparent_background(
+            context, self.transparent_background),
     )
 
 

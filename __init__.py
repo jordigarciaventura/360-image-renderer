@@ -1,3 +1,9 @@
+import importlib
+import os
+import sys
+
+import bpy
+
 bl_info = {
     "name": "360 Renderer",
     "description": "Render your models up to 360 degrees as image sequence",
@@ -11,39 +17,46 @@ bl_info = {
     "category": "Render",
 }
 
-import sys
-import os
-import importlib
-import bpy
+# Add path to use absolute imports
+file_path = os.path.realpath(__file__)
+dir_path = os.path.dirname(file_path)
+sys.path.append(dir_path)
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__))) # Add path to use absolute imports
-
-module_names = ["properties", "add_camera_controller", "add_light_controller", "align_location", "align_rotation", "swap_align", "insert_keyframes", "export_marker_names", "ui_panels"]
+module_names = ["properties",
+                "add_camera_controller",
+                "add_light_controller",
+                "align_location",
+                "align_rotation",
+                "swap_align",
+                "insert_keyframes",
+                "export_marker_names",
+                "ui_panels"]
 
 for module_name in module_names:
-  if module_name in sys.modules:
-    importlib.reload(sys.modules[module_name])
-  else:
-    importlib.import_module(module_name)
-    
+    if module_name in sys.modules:
+        importlib.reload(sys.modules[module_name])
+    else:
+        importlib.import_module(module_name)
+
 
 def register():
-  for module_name in module_names:
-    if module_name in sys.modules:
-        module = sys.modules[module_name]
-        if hasattr(module, 'register'):
-          module.register()
-          
-    bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=sys.modules["properties"].MyProperties)
+    for module_name in module_names:
+        if module_name in sys.modules:
+            module = sys.modules[module_name]
+            if hasattr(module, 'register'):
+                module.register()
+
+        bpy.types.Scene.my_tool = bpy.props.PointerProperty(
+            type=sys.modules["properties"].MyProperties)
 
 
 def unregister():
     del bpy.types.Scene.my_tool
-    
+
     for module_name in reversed(module_names):
         module = sys.modules[module_name]
         if hasattr(module, 'unregister'):
-          module.unregister()
+            module.unregister()
 
 
 if __name__ == "__main__":

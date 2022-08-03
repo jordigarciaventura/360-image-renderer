@@ -1,21 +1,17 @@
+from math import radians
+
 import bpy
 
 import properties as prop
 
-from math import radians
-from mathutils import Vector
-
 
 # Creates a Light Controller
 def create_light_controller(parent):
-    parent_rotation = Vector(
-        (parent.rotation_euler.x, parent.rotation_euler.y, parent.rotation_euler.z))
-
     # Create light pivot
     light_pivot = bpy.data.objects.new("Light Pivot", None)
     light_pivot.empty_display_type = 'SPHERE'
     light_pivot.location = parent.location
-    light_pivot.rotation_euler = parent_rotation
+    light_pivot.rotation_euler = parent.rotation_euler.copy()
     light_pivot.scale = parent.scale * 0.8
 
     # Add 'Child of' constraint
@@ -29,7 +25,8 @@ def create_light_controller(parent):
     light_data = bpy.data.lights.new("Light", type="AREA")
     light = bpy.data.objects.new("Light", light_data)
     light.location = parent.location
-    light.rotation_euler = parent_rotation + Vector((radians(90), 0, 0))
+    light.rotation_euler = parent.rotation_euler.copy()
+    light.rotation_euler.rotate_axis('X', radians(90))
     light.scale = light_pivot.scale * 4
 
     # Add 'Transform' constraint
@@ -87,9 +84,10 @@ class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
             self.report({"ERROR"}, prop.not_in_view_layer_error % "Controller")
             return {"FINISHED"}
 
-        # Add light controller
-        coll, _, light_pivot = create_light_controller(mytool.controller) # Create light controller
-        mytool.controller.users_collection[0].children.link(coll) # Add inside camera controller 
+        # Create light controller
+        coll, _, light_pivot = create_light_controller(mytool.controller)
+        # Add inside camera controller
+        mytool.controller.users_collection[0].children.link(coll)
 
         # Select controller
         for obj in context.selected_objects:

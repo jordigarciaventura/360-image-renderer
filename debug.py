@@ -1,5 +1,6 @@
 """
-Boot script for support debugging multi-file add-ons inside Blender 'Scripting' tab.
+Boot script for support debugging multi-file add-ons inside
+Blender 'Scripting' tab.
 
 Attributes
 ----------

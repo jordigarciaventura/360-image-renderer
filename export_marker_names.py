@@ -1,7 +1,6 @@
-import bpy
-from bpy.app.handlers import persistent
-
 import os
+
+import bpy
 
 import properties as prop
 
@@ -51,7 +50,7 @@ def export_marker_names(context):
 
     # Reset filepath
     scene.render.filepath = dir_path
-    
+
     # Render finished
     print(prop.render_finished_msg)
     wm.progress_end()
@@ -106,10 +105,12 @@ class RADIALRENDERER_OT_export(bpy.types.Operator):
 
 classes = (RADIALRENDERER_OT_export,)
 
+
 def register():
-  for cls in classes:
-    bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
 
 def unregister():
-  for cls in classes:
-    bpy.utils.unregister_class(cls)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
