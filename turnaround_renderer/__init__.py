@@ -33,6 +33,9 @@ ordered_module_names = [
     "render.operators"
 ]
 
+if __name__ != "__main__":
+    ordered_module_names = [f"{__name__}.{name}" for name in ordered_module_names]
+
 # IMPORT
 for module_name in ordered_module_names:
     if module_name in sys.modules:
