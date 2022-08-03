@@ -5,9 +5,9 @@ import sys
 bl_info = {
     "name": "360 Renderer",
     "description": "Render your models up to 360 degrees as image sequence",
-    "author": "Garven",
+    "author": "jordigarciaventura",
     "version": (1, 0),
-    "blender": (2, 81, 16),
+    "blender": (3, 2, 1),
     "location": "View3d > Tool",
     "warning": "",
     "wiki_url": "",
