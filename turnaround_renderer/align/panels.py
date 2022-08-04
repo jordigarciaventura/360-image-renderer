@@ -2,8 +2,8 @@ import bpy
 
 
 class TURNAROUND_RENDERER_PT_align(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
     bl_category = "360 Renderer"
     bl_label = "Align"
     bl_idname = "TURNAROUND_RENDERER_PT_align"
@@ -16,22 +16,26 @@ class TURNAROUND_RENDERER_PT_align(bpy.types.Panel):
         col = layout.column()
 
         box = col.box()
-
         sub = box.column(align=True)
 
         split = sub.split(factor=0.2)
         split.alignment = 'RIGHT'
         split.label(text="From")
         split.prop(props, "from_obj")
+
         sub.separator()
+
         split = sub.split(factor=0.2)
         split.alignment = 'RIGHT'
         split.label(text="To")
         split.prop(props, "to_obj")
+
         sub.separator(factor=2)
+
         sub.operator("turnaround_renderer.swap_align", text="Swap")
 
         col.separator(factor=1)
+
         sub = col.column()
         sub.scale_y = 1.5
         sub.operator("turnaround_renderer.align_location",

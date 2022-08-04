@@ -17,10 +17,10 @@ class Properties(bpy.types.PropertyGroup):
 
 def register():
     bpy.utils.register_class(Properties)
-    bpy.types.Scene.align_properties = bpy.props.PointerProperty(type=Properties)
+    bpy.types.Scene.align_properties = bpy.props.PointerProperty(
+        type=Properties)
 
 
 def unregister():
     del bpy.types.Scene.align_properties
     bpy.utils.unregister_class(Properties)
-

@@ -1,16 +1,12 @@
-import imp
-
-
 import bpy
 
 
 class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
     bl_category = "360 Renderer"
     bl_label = "Keyframe Assistant"
     bl_idname = "TURNAROUND_RENDERER_PT_keyframe_assistant"
-    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         layout = self.layout
@@ -19,14 +15,13 @@ class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
 
         col = layout.column()
 
-        # Object
         split = col.split(factor=0.2)
         split.alignment = 'RIGHT'
         split.label(text="Object")
         split.prop(props, "key_obj")
+
         col.separator()
 
-        # Markers name
         box = col.box()
         row = box.row(align=True)
         row.prop(props, "add_markers", text="")
@@ -38,7 +33,6 @@ class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
 
         col.separator()
 
-        # Horizontal Axis
         box = col.box()
 
         split = box.split(factor=0.7, align=True)
@@ -49,18 +43,15 @@ class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
 
         if props.x_axis:
             box.row().prop(props, "x_mode", expand=True)
-            subcol = box.column(align=True)
-            # Parts/Angle
+            sub = box.column(align=True)
             if props.x_mode == 'TURNAROUND':
-                subcol.prop(props, "x_clamped_angle", text="Angle")
-                subcol.prop(props, "x_steps", text="Parts")
-            # Angle/LeftSteps/RightSteps
+                sub.prop(props, "x_clamped_angle", text="Angle")
+                sub.prop(props, "x_steps", text="Parts")
             else:
-                subcol.prop(props, "x_angle", text="Angle")
-                subcol.prop(props, "left_steps", text="Left Steps")
-                subcol.prop(props, "right_steps", text="Right Steps")
+                sub.prop(props, "x_angle", text="Angle")
+                sub.prop(props, "left_steps", text="Left Steps")
+                sub.prop(props, "right_steps", text="Right Steps")
 
-        # Vertical Axis
         box = col.box()
 
         split = box.split(factor=0.7, align=True)
@@ -73,18 +64,16 @@ class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
 
             box.row().prop(props, "y_mode", expand=True)
 
-            subcol = box.column(align=True)
+            sub = box.column(align=True)
 
-            # Parts/Angle
             if props.y_mode == 'TURNAROUND':
-                subcol.prop(props, "y_clamped_angle", text="Angle")
-                subcol.prop(props, "y_steps", text="Parts")
+                sub.prop(props, "y_clamped_angle", text="Angle")
+                sub.prop(props, "y_steps", text="Parts")
 
-            # Angle/UpSteps/DownSteps
             else:
-                subcol.prop(props, "y_angle", text="Angle")
-                subcol.prop(props, "up_steps", text="Up Steps")
-                subcol.prop(props, "down_steps", text="Down Steps")
+                sub.prop(props, "y_angle", text="Angle")
+                sub.prop(props, "up_steps", text="Up Steps")
+                sub.prop(props, "down_steps", text="Down Steps")
 
         col.separator(factor=2)
 
@@ -92,15 +81,15 @@ class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
         row.prop(scene, "frame_current", text="Start")
         row.prop(props, "frame_end", text="End")
 
-        # Insert keyframes
         col.separator()
 
         row = col.row()
         row.scale_y = 1.5
+
         row.operator(
             "turnaround_renderer.insert_keyframes",
             text="Insert {} keyframe{}".format(
-                props.views_count, 's' if props.views_count != 1 else ''),
+                props.views_count, "s" if props.views_count != 1 else ""),
             icon='DECORATE_KEYFRAME',
         )
 

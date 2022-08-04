@@ -1,7 +1,7 @@
 import bpy
 
 from .utils import (create_camera_controller, create_light_controller,
-                         get_selection_center, get_selection_diameter)
+                    get_selection_center, get_selection_diameter)
 
 not_in_view_layer_error = "The %s is not in the View Layer"
 
@@ -16,20 +16,21 @@ class TURNAROUND_RENDERER_OT_add_light_controller(bpy.types.Operator):
     def poll(self, context):
         scene = context.scene
         props = scene.setup_properties
-        return bool(props.controller)
+        return props.camera_pivot
 
     def execute(self, context):
         scene = context.scene
         props = scene.setup_properties
+        camera_pivot = props.camera_pivot
 
-        if props.controller not in set(scene.objects):
-            self.report({"ERROR"}, not_in_view_layer_error % "Controller")
-            return {"FINISHED"}
+        if camera_pivot not in set(scene.objects):
+            self.report({'ERROR'}, not_in_view_layer_error % camera_pivot.name)
+            return {'FINISHED'}
 
         # Create light controller
-        coll, _, light_pivot = create_light_controller(props.controller)
+        coll, _, light_pivot = create_light_controller(camera_pivot)
         # Add inside camera controller
-        props.controller.users_collection[0].children.link(coll)
+        camera_pivot.users_collection[0].children.link(coll)
 
         # Select controller
         for obj in context.selected_objects:
@@ -37,7 +38,7 @@ class TURNAROUND_RENDERER_OT_add_light_controller(bpy.types.Operator):
         context.view_layer.objects.active = light_pivot
         light_pivot.select_set(True)
 
-        return {"FINISHED"}
+        return {'FINISHED'}
 
 
 class TURNAROUND_RENDERER_OT_add_camera_controller(bpy.types.Operator):
@@ -66,10 +67,10 @@ class TURNAROUND_RENDERER_OT_add_camera_controller(bpy.types.Operator):
         context.view_layer.objects.active = camera_pivot
         camera_pivot.select_set(True)
 
-        # Prefill camera pivot
-        props.controller = camera_pivot
+        # Prefill camera pivot input
+        props.camera_pivot = camera_pivot
 
-        return {"FINISHED"}
+        return {'FINISHED'}
 
 
 classes = (

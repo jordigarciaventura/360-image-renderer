@@ -2,8 +2,8 @@ import bpy
 
 
 class TURNAROUND_RENDERER_PT_setup(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
     bl_category = "360 Renderer"
     bl_label = "Setup"
     bl_idname = "TURNAROUND_RENDERER_PT_setup"
@@ -15,7 +15,6 @@ class TURNAROUND_RENDERER_PT_setup(bpy.types.Panel):
 
         col = layout.column()
 
-        # Add camera controller
         sub = col.row()
         sub.scale_y = 1.5
         sub.operator("turnaround_renderer.add_camera_controller",
@@ -23,16 +22,14 @@ class TURNAROUND_RENDERER_PT_setup(bpy.types.Panel):
 
         col.separator()
 
-        # Controller
         box = col.box()
 
         split = box.split(align=True, factor=0.4)
-        split.alignment = "RIGHT"
+        split.alignment = 'RIGHT'
 
         split.label(text="Camera pivot")
-        split.prop(props, "controller", icon='CON_CAMERASOLVER')
+        split.prop(props, "camera_pivot", icon='CON_CAMERASOLVER')
 
-        # Add light controller
         box.operator("turnaround_renderer.add_light_controller",
                      text="Add light controller")
 

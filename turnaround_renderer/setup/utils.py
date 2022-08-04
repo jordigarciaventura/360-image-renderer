@@ -4,6 +4,27 @@ from math import radians
 from mathutils import Vector
 
 
+def link_to_pivot(object, pivot):
+    # Add 'Transform' constraint
+    transform = object.constraints.new('TRANSFORM')
+    transform.target = pivot
+    transform.target_space = 'LOCAL'
+    transform.owner_space = 'LOCAL'
+    transform.map_from = 'SCALE'
+    transform.from_min_y_scale = 0
+    transform.from_max_y_scale = 100000
+    transform.map_to = 'LOCATION'
+    transform.map_to_z_from = 'Y'
+    transform.to_max_z = 100000
+
+    # Add 'Child of' constraint
+    child_of = object.constraints.new('CHILD_OF')
+    child_of.target = pivot
+    child_of.use_scale_x = False
+    child_of.use_scale_y = False
+    child_of.use_scale_z = False
+
+
 def create_light_controller(parent):
     # Create light pivot
     light_pivot = bpy.data.objects.new("Light Pivot", None)
@@ -27,24 +48,7 @@ def create_light_controller(parent):
     light.rotation_euler.rotate_axis('X', radians(90))
     light.scale = light_pivot.scale * 4
 
-    # Add 'Transform' constraint
-    light_transform = light.constraints.new('TRANSFORM')
-    light_transform.target = light_pivot
-    light_transform.target_space = 'LOCAL'
-    light_transform.owner_space = 'LOCAL'
-    light_transform.map_from = 'SCALE'
-    light_transform.from_min_y_scale = 0
-    light_transform.from_max_y_scale = 100000
-    light_transform.map_to = 'LOCATION'
-    light_transform.map_to_z_from = 'Y'
-    light_transform.to_max_z = 100000
-
-    # Add 'Child of' constraint
-    light_child_of = light.constraints.new('CHILD_OF')
-    light_child_of.target = light_pivot
-    light_child_of.use_scale_x = False
-    light_child_of.use_scale_y = False
-    light_child_of.use_scale_z = False
+    link_to_pivot(light, light_pivot)
 
     # Lock transforms
     light.lock_location[0] = True
@@ -75,24 +79,7 @@ def create_camera_controller(location, radius):
     camera.location = location
     camera.rotation_euler = (radians(90), 0, 0)
 
-    # Add 'Transform' constraint
-    light_transform = camera.constraints.new('TRANSFORM')
-    light_transform.target = camera_pivot
-    light_transform.target_space = 'LOCAL'
-    light_transform.owner_space = 'LOCAL'
-    light_transform.map_from = 'SCALE'
-    light_transform.from_min_y_scale = 0
-    light_transform.from_max_y_scale = 100000
-    light_transform.map_to = 'LOCATION'
-    light_transform.map_to_z_from = 'Y'
-    light_transform.to_max_z = 100000
-
-    # Add 'Child of' constraint
-    cam_child_of = camera.constraints.new('CHILD_OF')
-    cam_child_of.target = camera_pivot
-    cam_child_of.use_scale_x = False
-    cam_child_of.use_scale_y = False
-    cam_child_of.use_scale_z = False
+    link_to_pivot(camera, camera_pivot)
 
     # Lock camera transform
     camera.lock_location[0] = True

@@ -2,12 +2,11 @@ import bpy
 
 
 class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
     bl_category = "360 Renderer"
     bl_label = "Render"
     bl_idname = "TURNAROUND_RENDERER_PT_render"
-    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         layout = self.layout
@@ -16,14 +15,13 @@ class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
 
         col = layout.column()
 
-        # Path
         split = col.split(factor=0.2)
         split.alignment = 'RIGHT'
         split.label(text="Output")
         split.prop(scene.render, "filepath", text="")
 
-        # Only selected
         col.separator(factor=1)
+
         split = col.split(factor=0.2)
         split.label(text="")
         split.prop(props, "only_selected", text="Only selected")
@@ -33,7 +31,6 @@ class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
                    text="Transparent background")
         col.separator(factor=2)
 
-        # Range
         row = col.row(align=True)
         row.use_property_split = False
         row.prop(scene, "frame_start", text="Start")
@@ -41,7 +38,6 @@ class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
 
         col.separator()
 
-        # Render frames
         row = col.row()
         row.scale_y = 1.5
 
@@ -50,7 +46,7 @@ class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
         row.operator(
             "turnaround_renderer.export",
             text="Render {} frame{}".format(
-                frame_count, 's' if frame_count != 1 else ''),
+                frame_count, "s" if frame_count != 1 else ""),
             icon='RENDER_ANIMATION'
         )
 

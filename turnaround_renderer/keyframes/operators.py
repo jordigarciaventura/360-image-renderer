@@ -3,15 +3,16 @@ import re
 
 from .utils import rotate_and_add_markers
 
-marker_name_error = (
-    """A marker name can't contain any of these characters:
-    \\ / : * ? " < > |"""
-)
 
-
-def validate_file_name(name):
+def check_valid_marker_name(self, marker_name):
+    msg = "A marker name can't contain any of these characters:\n \
+        \\ / : * ? \" < > |"
     invalid_chars = r"[\\\/\:\*\?\"\<\>\|]"
-    return not re.search(invalid_chars, name)
+
+    if re.search(invalid_chars, marker_name):
+        self.report({'ERROR'}, msg)
+        return False
+    return True
 
 
 class TURNAROUND_RENDERER_OT_insert_keyframes(bpy.types.Operator):
@@ -32,9 +33,9 @@ class TURNAROUND_RENDERER_OT_insert_keyframes(bpy.types.Operator):
         scene = context.scene
         props = scene.keyframes_properties
 
-        if not validate_file_name(props.marker_name):
-            self.report({"ERROR"}, marker_name_error)
-            return {"FINISHED"}
+        # Check preconditions
+        if not check_valid_marker_name(self, props.marker_name):
+            return {'FINISHED'}
 
         # Necessary parameters
         obj = props.key_obj
@@ -72,7 +73,13 @@ class TURNAROUND_RENDERER_OT_insert_keyframes(bpy.types.Operator):
         # Move to start
         scene.frame_current = scene.frame_start
 
-        return {"FINISHED"}
+        # Select key object
+        for obj in context.selected_objects:
+            obj.select_set(False)
+        context.view_layer.objects.active = obj
+        obj.select_set(True)
+
+        return {'FINISHED'}
 
 
 classes = (TURNAROUND_RENDERER_OT_insert_keyframes,)

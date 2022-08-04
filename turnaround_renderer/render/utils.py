@@ -1,10 +1,6 @@
 import bpy
 import os
 
-render_started_msg = "360 RENDERER: render started\n"
-render_finished_msg = "360 RENDERER: render finished\n"
-frames_renderer_msg = "360 RENDERER: %s/%s frames rendered\n"
-
 
 def setup_transparent_background(context, enable):
     scene = context.scene
@@ -55,12 +51,13 @@ def isolate_selection(context, isolate):
                 obj.hide_render = obj.hide_viewport = False
 
 
-def export_marker_names(context):
+def render_by_marker_names(context):
+    render_started_msg = "360 RENDERER: render started\n"
+    render_finished_msg = "360 RENDERER: render finished\n"
+    frames_renderer_msg = "360 RENDERER: %s/%s frames rendered\n"
+
     scene = context.scene
     wm = context.window_manager
-
-    # Save project
-    bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
 
     # Set variables
     frame_start = scene.frame_start
