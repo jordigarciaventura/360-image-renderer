@@ -2,7 +2,7 @@ import importlib
 import sys
 
 bl_info = {
-    "name": "360 Renderer",
+    "name": "360 Image Renderer",
     "description": "Render your models up to 360 degrees as image sequence",
     "author": "jordigarciaventura",
     "version": (1, 0),
