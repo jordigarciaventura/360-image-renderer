@@ -13,12 +13,12 @@ init_file_name : str
 import os
 import sys
 
-project_dir = r"C:\Users\jordi\Documents\GitHub\360-renderer\turnaround_renderer"
+addon_dir = r"C:\Users\jordi\Documents\GitHub\360-renderer\turnaround_renderer"
 init_file_name = "__init__.py"
 
-if project_dir not in sys.path:
-    sys.path.append(project_dir)
+if addon_dir not in sys.path:
+    sys.path.append(addon_dir)
 
-file_path = os.path.join(project_dir, init_file_name)
+file_path = os.path.join(addon_dir, init_file_name)
 
 exec(compile(open(file_path).read(), init_file_name, 'exec'))
