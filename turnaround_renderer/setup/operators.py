@@ -60,11 +60,14 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
             spawn_location, radius)
         scene.collection.children.link(coll)  # Add to scene
 
-        # Select controller
+        # Select camera pivot
         for obj in context.selected_objects:
             obj.select_set(False)
         context.view_layer.objects.active = camera_pivot
         camera_pivot.select_set(True)
+
+        # Prefill camera pivot
+        props.controller = camera_pivot
 
         return {"FINISHED"}
 
