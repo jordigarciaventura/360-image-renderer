@@ -1,12 +1,12 @@
 import bpy
 
 
-class RADIALRENDERER_PT_align(bpy.types.Panel):
+class TURNAROUND_RENDERER_PT_align(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "360 Renderer"
     bl_label = "Align"
-    bl_idname = "RADIALRENDERER_PT_align"
+    bl_idname = "TURNAROUND_RENDERER_PT_align"
 
     def draw(self, context):
         layout = self.layout
@@ -29,19 +29,19 @@ class RADIALRENDERER_PT_align(bpy.types.Panel):
         split.label(text="To")
         split.prop(props, "to_obj")
         sub.separator(factor=2)
-        sub.operator("radialrenderer.swap_align", text="Swap")
+        sub.operator("turnaround_renderer.swap_align", text="Swap")
 
         col.separator(factor=1)
         sub = col.column()
         sub.scale_y = 1.5
-        sub.operator("radialrenderer.align_location",
+        sub.operator("turnaround_renderer.align_location",
                      text="Align Location", icon="EMPTY_AXIS")
-        sub.operator("radialrenderer.align_rotation",
+        sub.operator("turnaround_renderer.align_rotation",
                      text="Align Rotation", icon="ORIENTATION_GIMBAL")
 
 
 classes = (
-    RADIALRENDERER_PT_align,
+    TURNAROUND_RENDERER_PT_align,
 )
 
 

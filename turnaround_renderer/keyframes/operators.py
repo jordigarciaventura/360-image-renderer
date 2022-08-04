@@ -14,12 +14,12 @@ def validate_file_name(name):
     return not re.search(invalid_chars, name)
 
 
-class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_insert_keyframes(bpy.types.Operator):
     """Insert rotation keyframes and add, if enabled, a marker to each
     showing the axis steps count"""
 
     bl_label = "Create Keyframes"
-    bl_idname = "radialrenderer.insert_keyframes"
+    bl_idname = "turnaround_renderer.insert_keyframes"
 
     @classmethod
     def poll(self, context):
@@ -75,7 +75,7 @@ class RADIALRENDERER_OT_insert_keyframes(bpy.types.Operator):
         return {"FINISHED"}
 
 
-classes = (RADIALRENDERER_OT_insert_keyframes,)
+classes = (TURNAROUND_RENDERER_OT_insert_keyframes,)
 
 
 def register():

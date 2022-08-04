@@ -4,12 +4,12 @@ import imp
 import bpy
 
 
-class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel):
+class TURNAROUND_RENDERER_PT_keyframe_assistant(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "360 Renderer"
     bl_label = "Keyframe Assistant"
-    bl_idname = "RADIALRENDERER_PT_keyframe_assistant"
+    bl_idname = "TURNAROUND_RENDERER_PT_keyframe_assistant"
     bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
@@ -98,7 +98,7 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel):
         row = col.row()
         row.scale_y = 1.5
         row.operator(
-            "radialrenderer.insert_keyframes",
+            "turnaround_renderer.insert_keyframes",
             text="Insert {} keyframe{}".format(
                 props.views_count, 's' if props.views_count != 1 else ''),
             icon='DECORATE_KEYFRAME',
@@ -106,7 +106,7 @@ class RADIALRENDERER_PT_keyframe_assistant(bpy.types.Panel):
 
 
 classes = (
-    RADIALRENDERER_PT_keyframe_assistant,
+    TURNAROUND_RENDERER_PT_keyframe_assistant,
 )
 
 

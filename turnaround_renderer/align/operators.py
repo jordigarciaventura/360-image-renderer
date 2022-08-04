@@ -1,11 +1,11 @@
 import bpy
 
 
-class RADIALRENDERER_OT_align_rotation(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_align_rotation(bpy.types.Operator):
     """Align objects rotation"""
 
     bl_label = "Orientate"
-    bl_idname = "radialrenderer.align_rotation"
+    bl_idname = "turnaround_renderer.align_rotation"
 
     @classmethod
     def poll(self, context):
@@ -28,11 +28,11 @@ class RADIALRENDERER_OT_align_rotation(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class RADIALRENDERER_OT_align_location(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_align_location(bpy.types.Operator):
     """Align objects location"""
 
     bl_label = "Align"
-    bl_idname = "radialrenderer.align_location"
+    bl_idname = "turnaround_renderer.align_location"
 
     @classmethod
     def poll(self, context):
@@ -55,11 +55,11 @@ class RADIALRENDERER_OT_align_location(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class RADIALRENDERER_OT_swap_align(bpy.types.Operator):
-    """Swap align items"""
+class TURNAROUND_RENDERER_OT_swap_align(bpy.types.Operator):
+    """Swap align objects"""
 
     bl_label = "Swap"
-    bl_idname = "radialrenderer.swap_align"
+    bl_idname = "turnaround_renderer.swap_align"
 
     @classmethod
     def poll(self, context):
@@ -83,9 +83,9 @@ class RADIALRENDERER_OT_swap_align(bpy.types.Operator):
 
 
 classes = (
-    RADIALRENDERER_OT_swap_align,
-    RADIALRENDERER_OT_align_rotation,
-    RADIALRENDERER_OT_align_location
+    TURNAROUND_RENDERER_OT_swap_align,
+    TURNAROUND_RENDERER_OT_align_rotation,
+    TURNAROUND_RENDERER_OT_align_location
 )
 
 

@@ -6,11 +6,11 @@ from .utils import (create_camera_controller, create_light_controller,
 not_in_view_layer_error = "The %s is not in the View Layer"
 
 
-class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_add_light_controller(bpy.types.Operator):
     """Add a pre-built light controller"""
 
     bl_label = "Create Light Controller"
-    bl_idname = "radialrenderer.add_light_controller"
+    bl_idname = "turnaround_renderer.add_light_controller"
 
     @classmethod
     def poll(self, context):
@@ -40,11 +40,11 @@ class RADIALRENDERER_OT_add_light_controller(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_add_camera_controller(bpy.types.Operator):
     """Add a pre-built camera controller"""
 
     bl_label = "Create Camera Controller"
-    bl_idname = "radialrenderer.add_camera_controller"
+    bl_idname = "turnaround_renderer.add_camera_controller"
 
     def execute(self, context):
         scene = context.scene
@@ -73,8 +73,8 @@ class RADIALRENDERER_OT_add_camera_controller(bpy.types.Operator):
 
 
 classes = (
-    RADIALRENDERER_OT_add_light_controller,
-    RADIALRENDERER_OT_add_camera_controller
+    TURNAROUND_RENDERER_OT_add_light_controller,
+    TURNAROUND_RENDERER_OT_add_camera_controller
 )
 
 

@@ -1,12 +1,12 @@
 import bpy
 
 
-class RADIALRENDERER_PT_setup(bpy.types.Panel):
+class TURNAROUND_RENDERER_PT_setup(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "360 Renderer"
     bl_label = "Setup"
-    bl_idname = "RADIALRENDERER_PT_setup"
+    bl_idname = "TURNAROUND_RENDERER_PT_setup"
 
     def draw(self, context):
         layout = self.layout
@@ -18,7 +18,7 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel):
         # Add camera controller
         sub = col.row()
         sub.scale_y = 1.5
-        sub.operator("radialrenderer.add_camera_controller",
+        sub.operator("turnaround_renderer.add_camera_controller",
                      text="Add camera controller", icon='OUTLINER_OB_CAMERA')
 
         col.separator()
@@ -33,12 +33,12 @@ class RADIALRENDERER_PT_setup(bpy.types.Panel):
         split.prop(props, "controller", icon='CON_CAMERASOLVER')
 
         # Add light controller
-        box.operator("radialrenderer.add_light_controller",
+        box.operator("turnaround_renderer.add_light_controller",
                      text="Add light controller")
 
 
 classes = (
-    RADIALRENDERER_PT_setup,
+    TURNAROUND_RENDERER_PT_setup,
 )
 
 

@@ -21,11 +21,11 @@ def validate_file_name(name):
     return not re.search(invalid_chars, name)
 
 
-class RADIALRENDERER_OT_export(bpy.types.Operator):
+class TURNAROUND_RENDERER_OT_export(bpy.types.Operator):
     """Render animation using markers as filename"""
 
     bl_label = "Export Keyframes"
-    bl_idname = "radialrenderer.export"
+    bl_idname = "turnaround_renderer.export"
 
     def execute(self, context):
         scene = context.scene
@@ -68,7 +68,7 @@ class RADIALRENDERER_OT_export(bpy.types.Operator):
         return {"FINISHED"}
 
 
-classes = (RADIALRENDERER_OT_export,)
+classes = (TURNAROUND_RENDERER_OT_export,)
 
 
 def register():

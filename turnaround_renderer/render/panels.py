@@ -1,12 +1,12 @@
 import bpy
 
 
-class RADIALRENDERER_PT_render(bpy.types.Panel):
+class TURNAROUND_RENDERER_PT_render(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "360 Renderer"
     bl_label = "Render"
-    bl_idname = "RADIALRENDERER_PT_render"
+    bl_idname = "TURNAROUND_RENDERER_PT_render"
     bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
@@ -48,7 +48,7 @@ class RADIALRENDERER_PT_render(bpy.types.Panel):
         frame_count = 1 + scene.frame_end - scene.frame_start
 
         row.operator(
-            "radialrenderer.export",
+            "turnaround_renderer.export",
             text="Render {} frame{}".format(
                 frame_count, 's' if frame_count != 1 else ''),
             icon='RENDER_ANIMATION'
@@ -56,7 +56,7 @@ class RADIALRENDERER_PT_render(bpy.types.Panel):
 
 
 classes = (
-    RADIALRENDERER_PT_render,
+    TURNAROUND_RENDERER_PT_render,
 )
 
 
